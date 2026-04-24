@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from models.user import User
-from schemas.user import UserCreate, UserLogin
+from schemas import UserCreate, UserLogin
 from auth.auth import hash_password, verify_password, create_token
 
 # 创建路由对象，可以添加前缀和标签

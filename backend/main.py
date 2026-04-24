@@ -1,14 +1,9 @@
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from database import SessionLocal, engine, Base
-from models.user import User
-from schemas.user import UserCreate, UserLogin
-from auth.auth import hash_password, verify_password, create_token
-from routers import user_router
+from database import engine, Base
+from routers import user_router, room_router
 
 Base.metadata.create_all(bind=engine)
-
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -17,10 +12,13 @@ app.add_middleware(
     allow_methods=["*"],  # 允许所有请求方法 (GET, POST 等)
     allow_headers=["*"],  # 允许所有请求头
 )
-
-
 app.include_router(user_router)
+app.include_router(room_router)
+
 
 @app.get("/")
 def root():
+    """
+    :return:
+    """
     return {"msg": "ok"}

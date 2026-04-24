@@ -1,4 +1,7 @@
-#models / auth.py
+# models / user.py
+"""
+账号
+"""
 from sqlalchemy import Column, Integer, String
 from database import Base
 
@@ -6,7 +9,7 @@ from database import Base
 class User(Base):
     """
     user table:
-        uid: 用户id
+        uid: 用户 id
         username: 用户名
         name: 昵称
         password_hash: 密码哈希值
@@ -23,10 +26,10 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     name = Column(String, unique=True, index=True)
     password_hash = Column(String)
-    lv = Column(Integer)
-    win = Column(Integer)
+    lv = Column(Integer, default=1)
+    win = Column(Integer, default=0)
     email = Column(String)
     phone = Column(String)
     created_at = Column(String)
     last_login_at = Column(String)
-    status = Column(String)
+    status = Column(String, default="active")
