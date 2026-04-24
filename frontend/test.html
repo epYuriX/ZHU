@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI 接口测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 350px;
+        }
+        h2 { margin-top: 0; color: #333; font-size: 1.2rem; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #666; font-size: 0.9rem; }
+        input {
+            width: 100%; padding: 8px; border: 1px solid #ccc;
+            border-radius: 4px; box-sizing: border-box;
+        }
+        button {
+            width: 100%; padding: 10px; background-color: #007bff;
+            color: white; border: none; border-radius: 4px; cursor: pointer;
+            font-size: 1rem;
+        }
+        button:hover { background-color: #0056b3; }
+        .btn-secondary { background-color: #28a745; margin-bottom: 20px;}
+        .btn-secondary:hover { background-color: #218838; }
+
+        /* 响应展示区 */
+        .response-panel {
+            width: 400px; background: #2d2d2d; color: #a9b7c6;
+            padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow-y: auto; max-height: 80vh;
+        }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+        .success { color: #6a8759; }
+        .error { color: #cc7832; }
+    </style>
+</head>
+<body>
+
+    <div>
+        <div class="container" style="margin-bottom: 20px;">
+            <h2>系统状态</h2>
+            <button class="btn-secondary" onclick="testRoot()">测试根目录 (GET /)</button>
+        </div>
+
+        <div class="container" style="margin-bottom: 20px;">
+            <h2>用户注册 (POST /register)</h2>
+            <div class="form-group"><label>用户名</label><input type="text" id="reg-username"></div>
+            <div class="form-group"><label>姓名</label><input type="text" id="reg-name"></div>
+            <div class="form-group"><label>密码</label><input type="password" id="reg-password"></div>
+            <div class="form-group"><label>邮箱</label><input type="email" id="reg-email"></div>
+            <div class="form-group"><label>电话</label><input type="text" id="reg-phone"></div>
+            <button onclick="register()">注册</button>
+        </div>
+
+        <div class="container">
+            <h2>用户登录 (POST /login)</h2>
+            <div class="form-group"><label>用户名</label><input type="text" id="login-username"></div>
+            <div class="form-group"><label>密码</label><input type="password" id="login-password"></div>
+            <button onclick="login()">登录</button>
+        </div>
+    </div>
+
+    <div class="response-panel">
+        <h2 style="color: white; border-bottom-color: #444;">响应结果</h2>
+        <div id="loading" style="display:none; color: #f1c40f;">请求中...</div>
+        <pre id="response-output">等待请求...</pre>
+    </div>
+
+    <script>
+        // 你的 FastAPI 后端地址
+        const BASE_URL = "http://127.0.0.1:8000";
+
+        // 统一处理请求和UI渲染的函数
+        async function makeRequest(url, method, body = null) {
+            const output = document.getElementById('response-output');
+            const loading = document.getElementById('loading');
+
+            output.textContent = "";
+            loading.style.display = "block";
+
+            try {
+                const options = {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                };
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+
+                const response = await fetch(`${BASE_URL}${url}`, options);
+                const data = await response.json();
+
+                // 格式化输出 JSON
+                if (response.ok) {
+                    output.innerHTML = `<span class="success">Status: ${response.status} OK</span>\n\n` + JSON.stringify(data, null, 2);
+                } else {
+                    output.innerHTML = `<span class="error">Status: ${response.status} Error</span>\n\n` + JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                output.innerHTML = `<span class="error">网络错误或跨域拦截 (CORS)</span>\n\n${error.message}\n(请确保后端已启动且配置了 CORS)`;
+            } finally {
+                loading.style.display = "none";
+            }
+        }
+
+        // 测试根目录
+        function testRoot() {
+            makeRequest('/', 'GET');
+        }
+
+        // 注册
+        function register() {
+            const payload = {
+                username: document.getElementById('reg-username').value,
+                name: document.getElementById('reg-name').value,
+                password: document.getElementById('reg-password').value,
+                email: document.getElementById('reg-email').value,
+                phone: document.getElementById('reg-phone').value
+            };
+            makeRequest('/user/register', 'POST', payload);
+        }
+
+        // 登录
+        function login() {
+            const payload = {
+                username: document.getElementById('login-username').value,
+                password: document.getElementById('login-password').value
+            };
+            makeRequest('/user/login', 'POST', payload);
+        }
+    </script>
+</body>
+</html>
