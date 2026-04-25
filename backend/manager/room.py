@@ -19,9 +19,26 @@ class Room:
         self.room_id = room_id
         self.room_name = room_name
         self.host_id = host_id
-        self.players: List[Dict] = []  # 存储 {"user_id": int, "ws": WebSocket}
+        # 存储 {
+        # "user_id": int,
+        # "ws": WebSocket,
+        # "is_ready": bool,
+        # }
+        self.players: List[Dict] = []
         self.max_players = 4
-        self.status = "waiting" # waiting (等待中) 或 playing (游戏中)
+        self.status = "waiting"  # waiting (等待中) 或 playing (游戏中)
+
+    async def send_to_player(self, user_id, message: dict):
+        """
+        给特定用户发消息
+        :param user_id:
+        :param message:
+        :return:
+        """
+        for player in self.players:
+            if player["user_id"] == user_id:
+                await player["ws"].send_json(message)
+                break
 
     async def broadcast(self, message: dict):
         """
@@ -120,6 +137,45 @@ class RoomManager:
             "status": "success",
             "msg": "已退出房间"
         }
+
+    async def toggle_ready(self, room_id: str, user_id: int):
+        """
+
+        :param room_id:
+        :param user_id:
+        :return:
+        """
+        room = self.get_room(room_id)
+        if not room or room.status != "waiting":
+            return
+        for player in room.players:
+            if player["user_id"] == user_id:
+                player["is_ready"] = !player.get("is_ready", False)
+                break
+        # 广播
+        await room.broadcast({
+            "event": "player_status_change",
+            "user_id": user_id,
+            "players_status": [
+                {
+                    "user_id": p["user_id"],
+                    "is_ready": p.get("is_ready", False),
+                }
+                for p in room.players
+            ]
+        })
+        # 检查是否可以开始游戏
+        await self.check_start_game(room)
+
+    async def check_start_game(self, room: Room):
+        ready_count = sum(1 for p in room.players if p.get("is_ready", False))
+        if ready_count >= 3 and ready_count == len(room.players):
+            room.status = "playing"
+            await room.broadcast({
+                "event": "game_start",
+                "msg": "全员就绪，游戏开始",
+                "status": room.status,
+            })
 
 
 room_manager = RoomManager()

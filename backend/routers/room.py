@@ -17,13 +17,13 @@ async def list_rooms():
     return room_manager.get_room_list()
 
 
-@router.websocket("/ws/{room_id}/{userid}")
-async def join_room(websocket: WebSocket, room_id: str, userid: int):
+@router.websocket("/ws/{room_id}/{user_id}")
+async def join_room(websocket: WebSocket, room_id: str, user_id: int):
     """
     加入房间
     :param websocket:
     :param room_id:
-    :param userid:
+    :param user_id:
     :return:
     """
     room = room_manager.get_room(room_id)
@@ -34,25 +34,32 @@ async def join_room(websocket: WebSocket, room_id: str, userid: int):
         await websocket.close(reason="房间已满")
         return
     await websocket.accept()
-    room.players.append({
-        "user_id": userid,
+    new_player = {
+        "user_id": user_id,
         "ws": websocket,
-    })
+        "is_ready": False,
+    }
+    room.players.append(new_player)
     # 玩家进入房间通知
     await room.broadcast({
         "room_id": room.room_id,
-        "user_id": userid,
+        "user_id": user_id,
     })
     try:
         while True:
             data = await websocket.receive_json()
-            await room.broadcast({
-                "event": "action",
-                "user_id": userid,
-                "data": data
-            })
+            msg_type = data.get("type")
+            if msg_type == "READY":
+                await room_manager.toggle_room(room.room_id, user_id)
+            elif msg_type == "ACTION":
+                if room.status == "playing":
+                    await room.broadcast({
+                        "event": "action",
+                        "user_id": user_id,
+                        "data": data.get("payload")
+                    })
     except WebSocketDisconnect:
-        await room_manager.leave_room(room_id, userid)
+        await room_manager.leave_room(room_id, user_id)
 
 
 @router.post("/create")

@@ -6,10 +6,9 @@ from models.user import User
 from schemas import UserCreate, UserLogin
 from auth.auth import hash_password, verify_password, create_token
 
-# 创建路由对象，可以添加前缀和标签
 router = APIRouter(
-    prefix="/user",  # 自动为下面所有接口加上 /users 前缀
-    tags=["用户模块"]  # 在 Swagger 文档中自动归类
+    prefix="/user",
+    tags=["用户模块"]
 )
 
 
