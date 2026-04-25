@@ -1,3 +1,4 @@
+# auth / auth.py
 from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta
@@ -29,7 +30,7 @@ def verify_password(plain, hashed):
 
 def create_token(data: dict):
     """
-    生成 JWT
+    生成 token
     :param data: 
     :return:
     """
@@ -37,3 +38,15 @@ def create_token(data: dict):
     expire = datetime.utcnow() + timedelta(hours=2)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+def verify_token(token: str):
+    """
+    验证 token
+    :param token:
+    :return:
+    """
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except Exception:
+        return None

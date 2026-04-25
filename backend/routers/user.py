@@ -49,7 +49,10 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="用户不存在")
     if not verify_password(user.password, db_user.password_hash):
         raise HTTPException(status_code=400, detail="密码错误")
-    token = create_token({"sub": db_user.username})
+    token = create_token({
+        "sub": db_user.username,
+        "user_id": db_user.id
+    })
     return {
         "access_token": token,
         "token_type": "bearer"

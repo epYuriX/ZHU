@@ -1,4 +1,6 @@
 # manager / room.py
+from doctest import FAIL_FAST
+
 from fastapi import WebSocket
 from typing import Dict, List, Optional
 import uuid
@@ -28,6 +30,19 @@ class Room:
         self.players: List[Dict] = []
         self.max_players = 4
         self.status = "waiting"  # waiting (等待中) 或 playing (游戏中)
+
+    async def set_mode(self, mode: int):
+        """
+        模式切换 - 人数
+        :param mode: 3 / 4
+        :return:
+        """
+        if mode not in [3, 4]:
+            return False, "无效的模式"
+        if mode == 3 and len(self.players) > 3:
+            return False, "当前人数超过3人，无法切换为3人模式"
+        self.max_players = mode
+        return True, f"已切换为 - {mode} - 人模式"
 
     async def send_to_player(self, user_id, message: dict):
         """
@@ -168,15 +183,51 @@ class RoomManager:
         await self.check_start_game(room)
 
     async def check_start_game(self, room: Room):
+        """
+        是否可以开始游戏
+        :param room:
+        :return:
+        """
         ready_count = sum(1 for p in room.players if p.get("is_ready", False))
-        if ready_count >= 3 and ready_count == len(room.players):
+        if ready_count == room.max_players:
             room.status = "playing"
             await room.broadcast({
                 "type": ServerBroadcast.GAME_START,
                 "payload": {
                     "status": room.status,
-                    "msg": "start"
+                    "msg": f" {room.max_players} 人模式，游戏开始"
                 }
+            })
+
+    async def kick_player(self, room_id: str, operator_id: int, target_id: int):
+        """
+        房主踢人
+        :param room_id:
+        :param operator_id:
+        :param target_id:
+        :return:
+        """
+        room = self.get_room(room_id)
+        if not room:
+            return
+        if operator_id != room.host_id:
+            await room.send_to_player(operator_id, {
+                "type": ServerMessage.ERROR,
+                "msg": "只有房主可以踢人"
+            })
+            return
+        target_player = next((p for p in room.players if p["user_id"] == target_id), None)
+        if target_player:
+            await target_player["ws"].send_json({
+                "type": ServerMessage.ERROR,
+                "msg": "你已飞升"
+            })
+            await target_player["ws"].close(code=1000)
+            room.players = [p for p in room.players if p["user_id"] != target_id]
+            await room.broadcast({
+                "type": ServerBroadcast.PLAYER_LEFT,
+                "user_id": target_id,
+                "msg": f"玩家 {target_id} 已飞升"
             })
 
 
