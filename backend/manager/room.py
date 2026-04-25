@@ -2,6 +2,7 @@
 from fastapi import WebSocket
 from typing import Dict, List, Optional
 import uuid
+from schemas import ServerBroadcast, ServerMessage
 
 
 class Room:
@@ -103,44 +104,41 @@ class RoomManager:
         :param user_id: 用户 id
         :return:
         """
-        if room_id not in self.active_rooms:
+        room = self.get_room(room_id)
+        if not room:
             return {
                 "status": "error",
                 "msg": "room not exist",
             }
-        room = self.active_rooms[room_id]
         # 移除该玩家
         room.players = [p for p in room.players if p["user_id"] != user_id]
         # 房主离开则解散
-        if user_id == room.host_id:
+        if user_id in room.host_id:
             await room.broadcast({
-                "event": "room_disbanded",
-                "msg": "房主已离开，房间解散",
+                "type": ServerBroadcast.ROOM_DISBANDED,
+                "msg": "房间解散 - 房主已离开",
             })
             self.remove_room(room_id)
             return {
                 "status": "disbanded",
-                "msg": "房间已解散",
             }
         # 房间为空则解散
         if not room.players:
             self.remove_room(room_id)
             return {
                 "status": "empty",
-                "msg": "房间已销毁",
             }
         await room.broadcast({
-            "event": "player_left",
+            "type": ServerBroadcast.PLAYER_LEFT,
             "user_id": user_id,
         })
         return {
             "status": "success",
-            "msg": "已退出房间"
         }
 
     async def toggle_ready(self, room_id: str, user_id: int):
         """
-
+        玩家切换准备状态
         :param room_id:
         :param user_id:
         :return:
@@ -150,21 +148,23 @@ class RoomManager:
             return
         for player in room.players:
             if player["user_id"] == user_id:
-                player["is_ready"] = !player.get("is_ready", False)
+                player["is_ready"] = not player.get("is_ready", False)
                 break
         # 广播
         await room.broadcast({
-            "event": "player_status_change",
-            "user_id": user_id,
-            "players_status": [
-                {
-                    "user_id": p["user_id"],
-                    "is_ready": p.get("is_ready", False),
-                }
-                for p in room.players
-            ]
+            "type": ServerBroadcast.PLAYER_READY,
+            "payload": {
+                "user_id": user_id,
+                "players_status": [
+                    {
+                        "user_id": p["user_id"],
+                        "is_ready": p["is_ready"],
+                    }
+                    for p in room.players
+                ]
+            }
         })
-        # 检查是否可以开始游戏
+        # 检查是否全员准备
         await self.check_start_game(room)
 
     async def check_start_game(self, room: Room):
@@ -172,9 +172,11 @@ class RoomManager:
         if ready_count >= 3 and ready_count == len(room.players):
             room.status = "playing"
             await room.broadcast({
-                "event": "game_start",
-                "msg": "全员就绪，游戏开始",
-                "status": room.status,
+                "type": ServerBroadcast.GAME_START,
+                "payload": {
+                    "status": room.status,
+                    "msg": "start"
+                }
             })
 
 
