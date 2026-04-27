@@ -48,6 +48,34 @@ class GameEngine:
         #
         #
 
+    def get_game_state(self):
+        """
+        获取游戏快照
+        """
+        return {
+            "info": {
+                "phase": self.phase,
+                "round": self.current_round,
+                "banker": self.current_banker,
+                "next_banker": self.next_banker,
+                "active_user": self._get_current_active_user()
+            },
+            "players": {
+                uid: {
+                    "identity": p.identity,
+                    "pos": p.current_node,
+                    "res": {
+                        "money": p.money,
+                        "yuan_yan": p.yuan_yan,
+                        "yuan_shi": p.yuan_shi,
+                        "yi_tie": p.yi_tie,
+                        "zcys": p.zcys
+                    },
+                    "is_banker": p.is_banker
+                } for uid, p in self.players.items()
+            }
+        }
+
     def start_new_round(self):
         """
         进入新回合
@@ -75,6 +103,7 @@ class GameEngine:
         回合结束
         :return:
         """
+        # 庄家转正
         self.current_banker = self.next_banker
         # 回合结束时其它操作
         #
@@ -85,12 +114,6 @@ class GameEngine:
         # 下一回合开始
         self.start_new_round()
 
-    def get_game_state(self):
-        """
-        获取游戏快照
-        """
-        return {}
-
     async def handle_setup_select(self, user_id: int, node_id: int):
         """
         初始选位
@@ -99,10 +122,10 @@ class GameEngine:
         :return:
         """
         # 校验
-        if self.phase != "setup":
+        if self.phase != "prep":
             return {
                 "status": "error",
-                "msg": "当前不是选位阶段"
+                "msg": "非准备阶段"
             }
         if user_id != self.player_order[self.turn_index]:
             return {
@@ -140,6 +163,14 @@ class GameEngine:
             "msg": "选位成功",
             "next_player": self.player_order[self.turn_index]
         }
+
+    def _get_current_active_user(self):
+        """
+        确定当前行动玩家
+        :return:
+        """
+        order = self.player_order if self.phase == "prep" else self.active_order
+        return order[self.turn_index] if self.turn_index < len(order) else None
 
     def skill_steal_banker(self, thief_id: int):
         """
