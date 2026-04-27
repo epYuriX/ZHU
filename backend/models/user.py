@@ -1,7 +1,4 @@
 # models / user.py
-"""
-账号
-"""
 from sqlalchemy import Column, Integer, String
 from database import Base
 

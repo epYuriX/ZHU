@@ -1,6 +1,6 @@
 # game / engine.py
 import random
-from .map import MapManager
+from .map import MapManager as MapManager
 from .player import Player
 
 
@@ -10,6 +10,7 @@ class GameEngine:
         游戏准备
         :param user_ids:
         """
+        self.map_manager = MapManager()
         # 随机分配顺序
         random.shuffle(user_ids)
         self.player_order = user_ids
@@ -26,6 +27,12 @@ class GameEngine:
 
         self.phase = "setup"
         self.current_round = 0  # 回合数
+        # 游戏开始时其他操作
+        #
+        #
+        #
+        #
+        #
 
     def start_new_round(self):
         """
@@ -54,7 +61,7 @@ class GameEngine:
         :return:
         """
         self.current_banker = self.next_banker
-        # 回合结束操作
+        # 回合结束时其它操作
         #
         #
         #
@@ -62,6 +69,56 @@ class GameEngine:
         #
         # 下一回合开始
         self.start_new_round()
+
+    async def handle_setup_select(self, user_id: int, node_id: int):
+        """
+        初始选位
+        :param user_id:
+        :param node_id:
+        :return:
+        """
+        # 校验
+        if self.phase != "setup":
+            return {
+                "status": "error",
+                "msg": "当前不是选位阶段"
+            }
+        if user_id != self.player_order[self.turn_index]:
+            return {
+                "status": "error",
+                "msg": "请等待其他玩家选位"
+            }
+        # 节点校验
+        node = self.map_manager.get_node_info(node_id)
+        if not node or node["id"] not in self.map_manager.initial_optional_ids:
+            return {
+                "status": "error",
+                "msg": "不可选择该位置作为起点"
+            }
+        if node["parking"] != "null":
+            return {
+                "status": "error",
+                "msg": "不可选择已有玩家的位置作为起点"
+            }
+        # 占领
+        player = self.players[user_id]
+        player.current_node = node_id
+        node["parking"] = player.identity
+        self.turn_index += 1
+        #
+        if self.turn_index >= len(self.player_ids):
+            self.phase = "playing"
+            self.start_new_round()
+            return {
+                "status": "success",
+                "msg": "选位结束, 游戏开始",
+                "next_phase": "playing"
+            }
+        return {
+            "status": "success",
+            "msg": "选位成功",
+            "next_player": self.player_order[self.turn_index]
+        }
 
     def skill_steal_banker(self, thief_id: int):
         """
