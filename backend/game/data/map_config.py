@@ -528,7 +528,7 @@ NODE_DATAILS_4 = [
     }
 ]
 # 可选初始位置
-OPTIONAL = [1, 2, 4, 5, 7, 19]
+OPTIONAL_4 = [1, 2, 4, 5, 7, 19]
 # 4人邻接矩阵
 ADJACENCY_MATRIX_4 = [
 
