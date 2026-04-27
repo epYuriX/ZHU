@@ -1,6 +1,7 @@
 # game / engine.py
 import random
-from .map import MapManager as MapManager
+from .map_manager import MapManager
+from .resource_manager import ResourceManager
 from .player import Player
 
 
@@ -26,6 +27,7 @@ class GameEngine:
         :param user_ids:
         """
         self.map_manager = MapManager()
+        self.resource_manager = ResourceManager()
         # 分配顺序
         random.shuffle(user_ids)
         self.player_ids = user_ids
@@ -114,7 +116,7 @@ class GameEngine:
         # 下一回合开始
         self.start_new_round()
 
-    async def handle_setup_select(self, user_id: int, node_id: int):
+    async def handle_prep_select(self, user_id: int, node_id: int):
         """
         初始选位
         :param user_id:
@@ -148,6 +150,7 @@ class GameEngine:
         player = self.players[user_id]
         player.current_node = node_id
         node["parking"] = player.identity
+        discovery_result = await self._discover_resource_node(user_id, node_id)
         self.turn_index += 1
         #
         if self.turn_index >= len(self.player_ids):
@@ -156,11 +159,14 @@ class GameEngine:
             return {
                 "status": "success",
                 "msg": "选位结束, 游戏开始",
+                "discovery": discovery_result,
                 "next_phase": "playing"
             }
+        card_name = discovery_result.get("card_name", "未知资源") if discovery_result else "未知资源"
         return {
             "status": "success",
-            "msg": "选位成功",
+            "msg": f"选位成功，你发现了: {card_name}",
+            "discovery": discovery_result,
             "next_player": self.player_order[self.turn_index]
         }
 
@@ -171,6 +177,36 @@ class GameEngine:
         """
         order = self.player_order if self.phase == "prep" else self.active_order
         return order[self.turn_index] if self.turn_index < len(order) else None
+
+    async def _discover_resource_node(self, user_id: int, node_id: int):
+        """
+        探索资源点
+        :param user_id:
+        :param node_id:
+        :return:
+        """
+        player = self.players[user_id]
+        node = self.map_manager.get_node_info(node_id)
+        if node.get("resource") != "null":
+            return None
+        level = f"lv{node['lv']}"
+        card = self.resource_manager.draw_resource_card(level)
+        if not card:
+            return None
+        # 设置资源点类型
+        node["resource"] = card["map_attribute"]["resource"]
+        node["resource_c"] = card["map_attribute"]["resource_c"]
+        # 一次性奖励
+        bonus = card["instant_bonus"]
+        for res_type, amount in bonus.items():
+            if hasattr(player, res_type):
+                current_val = getattr(player, res_type)
+                setattr(player, res_type, current_val + amount)
+        return {
+            "card_name": card["name"],
+            "map_update": card["map_attribute"],
+            "player_bonus": bonus,
+        }
 
     def skill_steal_banker(self, thief_id: int):
         """

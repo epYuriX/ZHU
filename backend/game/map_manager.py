@@ -1,4 +1,4 @@
-# game / map.py
+# game / map_manager.py
 from platform import node
 
 from .data.map_config import (
