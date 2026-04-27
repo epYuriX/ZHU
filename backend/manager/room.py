@@ -1,6 +1,5 @@
 # manager / room.py
 from doctest import FAIL_FAST
-
 from fastapi import WebSocket
 from typing import Dict, List, Optional
 import uuid
