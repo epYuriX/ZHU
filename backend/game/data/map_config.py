@@ -6,12 +6,12 @@ NODE_DATAILS_4 = [
         "type": "node",  # node - 资源点, link - 通道
         "lv": 1,  # node le
         "name": "A-01",  # node name
-        "area": "A",  # 所属区
+        "area": "A",  # 所属区块
         "color": "#007BFF",  # 所属区颜色
         "resource": "null",  # 资源类型
         "resource_c": 0,  # 资源乘数
         "parking": "null",  # 存在玩家所属方
-        "inf_c": 2,  # 影响力棋子数量
+        "inf_c": 2,  # 影响力棋子容量
         "inf_1": "null",  # 影响力1所属方
         "inf_2": "null",  # 影响力2所属方
     },
@@ -527,6 +527,8 @@ NODE_DATAILS_4 = [
         "inf_1": "null",
     }
 ]
+# 可选初始位置
+OPTIONAL = [1, 2, 4, 5, 7, 19]
 # 4人邻接矩阵
 ADJACENCY_MATRIX_4 = [
 
@@ -678,7 +680,7 @@ ADJACENCY_LIST_4 = [
         # 22
     ]
 ]
-# 4人邻接表追加后
+# 4人邻接表（第4回合时追加, 改用此表）
 ADJACENCY_LIST_APPEND_4 = [
     [
         # 0
@@ -857,6 +859,7 @@ ADJACENCY_LIST_APPEND_4 = [
         {"id": 21, "by": 37},
     ]
 ]
+# 3人模式没人玩所以先不做
 # 3人地图
 NODE_DATAILS_3 = [
     # 懒得做
