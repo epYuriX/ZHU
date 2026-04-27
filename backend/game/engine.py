@@ -5,28 +5,42 @@ from .player import Player
 
 
 class GameEngine:
+    """
+    游戏控制器
+        phase: 当前阶段
+        current_round: 当前回合数
+        ---------------- 玩家管理
+        players: {user_id: Player对象} 玩家实体
+        player_ids: 座位表
+        player_order: 准备阶段操作顺序
+        active_order: 当前回合操作顺序 (随庄家动态调整)
+        trun_index: 当前在该顺序下行动指针 (0-3)
+        ---------------- 庄家机制
+        current_banker: 本回合庄家ID
+        next_banker: 预设下回合庄家ID
+    """
+
     def __init__(self, user_ids: list):
         """
-        游戏准备
+        游戏初始化
         :param user_ids:
         """
         self.map_manager = MapManager()
-        # 随机分配顺序
+        # 分配顺序
         random.shuffle(user_ids)
+        self.player_ids = user_ids
         self.player_order = user_ids
         self.players = {
             uid: Player(uid, f"P{i + 1}") for i, uid in enumerate(user_ids)
         }
-        # 设 P1 为初始庄家
+        # 庄家初始化
         self.current_banker = user_ids[0]
         self.next_banker = user_ids[1]
-        self.player_ids = user_ids
-        # 玩家行动顺序管理
+        # 流程初始化
+        self.phase = "prep"
+        self.current_round = 0
         self.active_order = []  # 本回合行动顺序
         self.turn_index = 0  # 回合内玩家指针
-
-        self.phase = "setup"
-        self.current_round = 0  # 回合数
         # 游戏开始时其他操作
         #
         #
@@ -36,17 +50,18 @@ class GameEngine:
 
     def start_new_round(self):
         """
-        回合开始
+        进入新回合
         :return:
         """
-        # 回合数 + 1
         self.current_round += 1
-        # 预设下一位庄家
+        # 庄家顺位
         idx = self.player_ids.index(self.current_banker)
         default_next_idx = (idx + 1) % len(self.player_ids)
         self.next_banker = self.player_ids[default_next_idx]
+        for uid, p in self.players.items():
+            p.is_banker = (uid == self.current_banker)
         # 生成本回合行动顺序
-        self.active_order = self.player_ids[idx:] + self.player_ids[:idx];
+        self.active_order = self.player_ids[idx:] + self.player_ids[:idx]
         self.turn_index = 0
         # 回合开始时其他操作
         #
@@ -69,6 +84,12 @@ class GameEngine:
         #
         # 下一回合开始
         self.start_new_round()
+
+    def get_game_state(self):
+        """
+        获取游戏快照
+        """
+        return {}
 
     async def handle_setup_select(self, user_id: int, node_id: int):
         """

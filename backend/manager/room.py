@@ -4,11 +4,15 @@ from fastapi import WebSocket
 from typing import Dict, List, Optional
 import uuid
 from schemas import ServerBroadcast, ServerMessage
+from game import GameEngine
 
 
 class Room:
     """
     房间
+        room_id: 房间 id
+        host_id: 房主 id
+        room_name: 房间列表
     """
 
     def __init__(self, room_id: str, room_name: str, host_id: int):
@@ -19,8 +23,8 @@ class Room:
         :param host_id:
         """
         self.room_id = room_id
-        self.room_name = room_name
         self.host_id = host_id
+        self.room_name = room_name
         # 存储 {
         # "user_id": int,
         # "ws": WebSocket,
@@ -29,6 +33,7 @@ class Room:
         self.players: List[Dict] = []
         self.max_players = 4
         self.status = "waiting"  # waiting (等待中) 或 playing (游戏中)
+        self.engine: Optional[GameEngine] = None
 
     async def set_mode(self, mode: int):
         """
@@ -63,6 +68,15 @@ class Room:
         """
         for player in self.players:
             await player["ws"].send_json(message)
+
+    async def start_game_logic(self):
+        """
+        初始化
+        :return:
+        """
+        user_ids = [p["user_id"] for p in self.players]
+        self.engine = GameEngine(user_ids)
+        return self.engine.get_game_state()
 
 
 class RoomManager:
@@ -190,11 +204,13 @@ class RoomManager:
         ready_count = sum(1 for p in room.players if p.get("is_ready", False))
         if ready_count == room.max_players:
             room.status = "playing"
+            game_state = await room.start_game_logic()
             await room.broadcast({
                 "type": ServerBroadcast.GAME_START,
                 "payload": {
                     "status": room.status,
-                    "msg": f" {room.max_players} 人模式，游戏开始"
+                    "msg": f" {room.max_players} 人模式，游戏开始",
+                    "initial_state": game_state
                 }
             })
 
