@@ -8,4 +8,10 @@ class Player:
         self.yuan_shi = 0  # 源石
         self.yi_tie = 0  # 异铁
         self.zcys = 0  # 至纯源石
+        self.space = [  # 建筑区
+            ["null", "null", "null"],
+            ["null", "null", "null"],
+            ["null", "null", "null"],
+        ]
         self.current_node = None  # 当前位置
+        self.is_banker = False  # 是否是庄家
