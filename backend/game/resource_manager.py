@@ -10,19 +10,20 @@ class ResourceManager:
 
     def __init__(self):
         self.pools = {
-            "lv1": RESOURCE_CARDS["lv1"].copy(),
-            "lv2": RESOURCE_CARDS["lv2"].copy(),
-            "lv3": RESOURCE_CARDS["lv3"].copy(),
+            "lv1": list(RESOURCE_CARDS["lv1"]),
+            "lv2": list(RESOURCE_CARDS["lv2"]),
+            "lv3": list(RESOURCE_CARDS["lv3"])
         }
-        for level in self.pools:
-            random.shuffle(self.pools[level])
+        for lv in self.pools:
+            random.shuffle(self.pools[lv])
 
-    def draw_resource_card(self, level: str):
+    def draw_resource_card(self, lv: str):
         """
         抽卡
-        :param level:
+        :param lv:
         :return:
         """
-        if self.pools.get(level):
-            return self.pools[level].pop()
+        pool = self.pools.get(lv)
+        if pool and len(pool) > 0:
+            return pool.pop()
         return None
