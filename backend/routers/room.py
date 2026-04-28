@@ -20,41 +20,31 @@ async def list_rooms():
 
 
 @router.websocket("/ws/{room_id}")
-async def join_room(websocket: WebSocket, room_id: str, token: str = Query(...)):
+async def ws_join_room(websocket: WebSocket, room_id: str, token: str = Query(...)):
     """
-    加入房间
-    :param websocket:
-    :param room_id:
-    :param token:
-    :return:
+    加入房间 WebSocket 完整实现
     """
+    # 鉴权
     payload = verify_token(token)
     if not payload:
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
     user_id = payload.get("user_id")
-    room = room_manager.get_room(room_id)
-    # 检查
-    if not room:
-        await websocket.close(reason="房间不存在")
-        return
-    if len(room.players) >= room.max_players:
+    # 调用管理器逻辑进行加入校验与入库
+    result = await room_manager.join_room(room_id, user_id, websocket)
+    if result["status"] == "error":
+        # 如果校验失败（如房满），先 accept 再发错误消息，最后 close
         await websocket.accept()
         await websocket.send_json({
             "type": ServerMessage.ERROR,
-            "msg": "房间已满"
+            "msg": result["msg"]
         })
         await websocket.close()
         return
-    # 入库
+    # 校验通过，正式接受连接
     await websocket.accept()
-    new_player = {
-        "user_id": user_id,
-        "ws": websocket,
-        "is_ready": False,
-    }
-    room.players.append(new_player)
-    # 告知新玩家当前房间信息
+    room = result["room"]
+    # 告知新玩家当前房间的初始快照
     await websocket.send_json({
         "type": ServerMessage.JOIN_SUCCESS,
         "payload": {
@@ -70,24 +60,22 @@ async def join_room(websocket: WebSocket, room_id: str, token: str = Query(...))
             ]
         }
     })
-    await room.broadcast({
-        "type": ServerBroadcast.PLAYER_JOINED,
-        "user_id": user_id,
-    })
+    # 进入消息监听循环
     try:
         while True:
             data = await websocket.receive_json()
             msg_type = data.get("type")
-            payload = data.get("payload", {})
-            # - 玩家准备 / 取消准备
+            msg_payload = data.get("payload", {})
+            #  准备 / 取消准备
             if msg_type == PlayerAction.READY:
                 await room_manager.toggle_ready(room_id, user_id)
-            # - 房主踢人
+            # 房主踢人
             elif msg_type == PlayerAction.KICK_PLAYER:
-                target_id = payload.get("target_id")
+                target_id = msg_payload.get("target_id")
                 if target_id:
-                    await room_manager.kick_room(room_id, user_id, target_id)
-            # - 设置模式 - 人数
+                    # 注意：Manager里的方法名是 kick_player
+                    await room_manager.kick_player(room_id, user_id, target_id)
+            # 设置房间模式 (3人/4人)
             elif msg_type == PlayerAction.SET_ROOM_MODE:
                 if user_id != room.host_id:
                     await websocket.send_json({
@@ -95,7 +83,7 @@ async def join_room(websocket: WebSocket, room_id: str, token: str = Query(...))
                         "msg": "只有房主能修改模式",
                     })
                     continue
-                new_mode = payload.get("mode")
+                new_mode = msg_payload.get("mode")
                 success, msg = await room.set_mode(new_mode)
                 if success:
                     await room.broadcast({
@@ -110,15 +98,23 @@ async def join_room(websocket: WebSocket, room_id: str, token: str = Query(...))
                         "type": ServerMessage.ERROR,
                         "msg": msg
                     })
-            # - 预留
-            elif msg_type == "???":
-                if room.status == "playing":
+
+            # 游戏进行中的指令转发 (预留)
+            elif msg_type == GameAction.PREP_SELECT:
+                # 示例：处理选位指令
+                if room.status == "playing" and room.engine:
+                    node_id = msg_payload.get("node_id")
+                    res = await room.engine.handle_prep_select(user_id, node_id)
+                    # 发送结果给所有人或发起者
                     await room.broadcast({
-                        "type": "???",
-                        "user_id": user_id,
-                        "data": data.get("???")
+                        "type": ServerBroadcast.GAME_STATE_UPDATE,
+                        "payload": {
+                            "result": res,
+                            "state": room.engine.get_game_state()
+                        }
                     })
     except WebSocketDisconnect:
+        # 掉线或关闭网页
         await room_manager.leave_room(room_id, user_id)
 
 
