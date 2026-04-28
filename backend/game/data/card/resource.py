@@ -33,7 +33,7 @@ RESOURCE_CARDS = {
                 "resource": "yuan_yan",
                 "resource_c": "1",
             },
-            "instant_options": [  # 选择战吼触发
+            "instant_options": [
                 {
                     "id": 0,
                     "describe": "现在就装一车源岩回城",
@@ -57,7 +57,7 @@ RESOURCE_CARDS = {
                 "resource": "yi_tie",
                 "resource_c": "1",
             },
-            "instant_options": [  # 选择战吼触发
+            "instant_options": [
                 {
                     "id": 0,
                     "describe": "向当地治安官邀功",
@@ -81,7 +81,7 @@ RESOURCE_CARDS = {
                 "resource": "yuan_shi",
                 "resource_c": "1",
             },
-            "instant_options": [  # 选择战吼触发
+            "instant_options": [
                 {
                     "id": 0,
                     "describe": "先把矿井外留下的资源设备收走",
@@ -106,7 +106,7 @@ RESOURCE_CARDS = {
                 "resource": "yuan_shi",
                 "resource_c": "1",
             },
-            "instant_options": [  # 选择战吼触发
+            "instant_options": [
                 {
                     "id": 0,
                     "describe": "#",
@@ -130,13 +130,12 @@ RESOURCE_CARDS = {
                 "resource": "yuan_shi",
                 "resource_c": "1",
             },
-            "instant_options": [  # 选择战吼触发
+            "instant_options": [
                 {
                     "id": 0,
                     "describe": "#",
                     "reward": {
                         "yi_tie": 4,
-
                     },
                 },
                 {
@@ -152,17 +151,390 @@ RESOURCE_CARDS = {
     "lv2": [
         {
             "name": "异铁开采权",
+            "describe": "#",
             "map_attribute": {
                 "resource": "yi_tie",
                 "resource_c": "1",
             },
-            "instant_options": [  # 选择战吼触发
+            "instant_options": [
                 {
                     "id": 0,
                     "describe": "#",
                     "reward": {
+                        "yuan_yan": 3,
+                        "yi_tie": 1,
+                    },
+                },
+                {
+                    "id": 1,
+                    "describe": "#",
+                    "reward": {
+                        "money": 13
+                        # 所有对手获得一异铁 - 未实现
+                    },
+                },
+            ]
+        },
+        {
+            "name": "富异铁区",
+            "describe": "#",
+            "map_attribute": {
+                "resource": "yi_tie",
+                "resource_c": "1",
+            },
+            "instant_options": [
+                {
+                    "id": 0,
+                    "describe": "#",
+                    "reward": {
+                        "yi_tie": 3,
+                    },
+                },
+                {
+                    "id": 1,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_shi": 2,
+                        "money": 5,
+                    },
+                },
+            ]
+        },
+        {
+            "name": "敌对生态圈",
+            "describe": "#",
+            "map_attribute": {
+                "resource": "yi_tie",
+                "resource_c": "1",
+            },
+            "instant_options": [
+                {
+                    "id": 0,
+                    "describe": "#",
+                    "reward": {
+                        "yi_tie": 3,
+                    },
+                },
+                {
+                    "id": 1,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_yan": 2,
+                        "score": 1,
+                    },
+                },
+            ]
+        },
+        {
+            "name": "洞穴和遗迹",
+            "describe": "#",
+            "map_attribute": {
+                "resource": "yuan_yan",
+                "resource_c": "1",
+            },
+            "instant_options": [
+                {
+                    "id": 0,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_yan": 5,
+                    },
+                },
+                {
+                    "id": 1,
+                    "describe": "#",
+                    "reward": {
+                        "money": 10,
+                    },
+                },
+                {
+                    "id": 2,
+                    "describe": "#",
+                    "reward": {
+                        "yi_tie": -1,
+                        # 选择一家企业 - 该玩家在此企业中的权限升一级 - 此为后续功能，暂未实现
+                    },
+                },
+            ]
+        },
+        {
+            "name": "荒地人村落",
+            "describe": "#",
+            "map_attribute": {
+                "resource": "yuan_yan",
+                "resource_c": "1",
+            },
+            "instant_options": [
+                {
+                    "id": 0,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_yan": 3,
+                        "yi_tie": 1,
+                    },
+                },
+                {
+                    "id": 1,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_shi": 4,
+                    },
+                },
+            ]
+        },
+        {
+            "name": "大型源岩场",
+            "describe": "#",
+            "map_attribute": {
+                "resource": "yuan_yan",
+                "resource_c": "1",
+            },
+            "instant_options": [
+                {
+                    "id": 0,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_yan": 5,
+                    },
+                },
+                {
+                    "id": 1,
+                    "describe": "#",
+                    "reward": {
+                        "money": 4,
+                        "score": 1,
+                    },
+                },
+            ]
+        },
+        {
+            "name": "锈锤领地",
+            "describe": "#",
+            "map_attribute": {
+                "resource": "yuan_shi",
+                "resource_c": "1",
+            },
+            "instant_options": [
+                {
+                    "id": 0,
+                    "describe": "#",
+                    "reward": {
+                        "money": -4,
+                        # 在地图上放置一个影响力 - 未实现
+                    },
+                },
+                {
+                    "id": 1,
+                    "describe": "#",
+                    "reward": {
+                        "money": 10,
+                    },
+                },
+                {
+                    "id": 2,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_shi": 4,
+                    },
+                },
+            ]
+        },
+        {
+            "name": "遭弃矿场",
+            "describe": "#",
+            "map_attribute": {
+                "resource": "yuan_shi",
+                "resource_c": "1",
+            },
+            "instant_options": [
+                {
+                    "id": 0,
+                    "describe": "#",
+                    "reward": {
+                        "yi_tie": 3,
+                    },
+                },
+                {
+                    "id": 1,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_shi": 4,
+                    },
+                },
+            ]
+        },
+        {
+            "name": "风险任务",
+            "describe": "#",
+            "map_attribute": {
+                "resource": "yuan_shi",
+                "resource_c": "1",
+            },
+            "instant_options": [
+                {
+                    "id": 0,
+                    "describe": "#",
+                    "reward": {
+                        "yi_tie": 3,
+                    },
+                },
+                {
+                    "id": 1,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_shi": 4,
+                    },
+                },
+            ]
+        },
+        {
+            "name": "情报交换",
+            "describe": "#",
+            "map_attribute": {
+                "resource": "yuan_shi",
+                "resource_c": "1",
+            },
+            "instant_options": [
+                {
+                    "id": 0,
+                    "describe": "#",
+                    "reward": {
+                        # 在此资源点(node)相邻的航道(link)上放置影响力 - 未实现
+                    },
+                },
+                {
+                    "id": 1,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_yan": 1,
+                        "yuan_shi": 3,
+                    },
+                },
+                {
+                    "id": 2,
+                    "describe": "#",
+                    "reward": {
+                        "yi_tie": 3,
+                    },
+                },
+            ]
+        },
+    ],
+    "lv3": [
+        {
+            "name": "险中净土",
+            "describe": "#",
+            "map_attribute": {
+                "resource": "yuan_yan",
+                "resource_c": "2",
+            },
+            "instant_options": [
+                {
+                    "id": 0,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_yan": 7,
+                    },
+                },
+                {
+                    "id": 1,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_shi": 6,
+                    },
+                },
+                {
+                    "id": 2,
+                    "describe": "#",
+                    "reward": {
+                        "money": 6,
+                        # 在此资源点或相邻的航道上放置一个影响力 - 未实现
+                    },
+                },
+            ]
+        },
+        {
+            "name": "高污染环境",
+            "describe": "#",
+            "map_attribute": {
+                "resource": "yuan_yan",
+                "resource_c": "2",
+            },
+            "instant_options": [
+                {
+                    "id": 0,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_yan": 2,
+                        "yuan_shi": 2,
+                        "yi_tie": 2,
+                    },
+                },
+                {
+                    "id": 1,
+                    "describe": "#",
+                    "reward": {
+                        "money": 18,
+                    },
+                },
+                {
+                    "id": 2,
+                    "describe": "#",
+                    "reward": {
+                        "zcys": 1,
+                        "money": 4,
+                    },
+                },
+            ]
+        },
+        {
+            "name": "采集平台残骸",
+            "describe": "#",
+            "map_attribute": {
+                "resource": "yi_tie",
+                "resource_c": "1",
+            },
+            "instant_options": [
+                {
+                    "id": 0,
+                    "describe": "#",
+                    "reward": {
+                        "score": -1,
+                        # 选择一家企业，升级该企业，与该企业合作一次（企业相关均为后续功能，目前略过）
+                    },
+                },
+                {
+                    "id": 1,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_yan": 4,
+                        "yuan_shi": 3,
+                    },
+                },
+                {
+                    "id": 2,
+                    "describe": "#",
+                    "reward": {
                         "yi_tie": 4,
-
+                        "money": 5,
+                    },
+                },
+            ]
+        },
+        {
+            "name": "深层矿床",
+            "describe": "#",
+            "map_attribute": {
+                "resource": "zcys",
+                "resource_c": "1",
+            },
+            "instant_options": [
+                {
+                    "id": 0,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_yan": 1,
+                        "zcys": 1,
                     },
                 },
                 {
@@ -170,53 +542,70 @@ RESOURCE_CARDS = {
                     "describe": "#",
                     "reward": {
                         "yuan_shi": 3,
+                        "yi_tie": 2,
+                    },
+                },
+                {
+                    "id": 2,
+                    "describe": "#",
+                    "reward": {
+                        "money": 18,
+                        # 所有其他玩家获得 money*3
                     },
                 },
             ]
         },
         {
-            "name": "",
+            "name": "地质瑰宝",
+            "describe": "#",
             "map_attribute": {
-                "resource": "",
-                "resource_c": "",
+                "resource": "zcys",
+                "resource_c": "1",
             },
-            "instant_bonus": {
-                "money": 0,
-                "yuan_yan": 0,
-                "yuan_shi": 0,
-                "yi_tie": 0,
-                "zcys": 0
-            }
-        },
-    ],
-    "lv3": [
-        {
-            "name": "",
-            "map_attribute": {
-                "resource": "",
-                "resource_c": "",
-            },
-            "instant_bonus": {
-                "money": 0,
-                "yuan_yan": 0,
-                "yuan_shi": 0,
-                "yi_tie": 0,
-                "zcys": 0
-            }
+            "instant_options": [
+                {
+                    "id": 0,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_shi": 1,
+                        "zcys": 1,
+                    },
+                },
+                {
+                    "id": 1,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_yan": 3,
+                        "yi_tie": 3,
+                    },
+                },
+            ]
         },
         {
-            "name": "",
+            "name": "裂谷矿脉",
+            "describe": "#",
             "map_attribute": {
-                "resource": "",
-                "resource_c": "",
+                "resource": "zcys",
+                "resource_c": "1",
             },
-            "instant_bonus": {
-                "money": 0,
-                "yuan_yan": 0,
-                "yuan_shi": 0,
-                "yi_tie": 0,
-                "zcys": 0
-            }
+            "instant_options": [
+                {
+                    "id": 0,
+                    "describe": "#",
+                    "reward": {
+                        "yi_tie": 1,
+                        "zcys": 1,
+                    },
+                },
+                {
+                    "id": 1,
+                    "describe": "#",
+                    "reward": {
+                        "yuan_yan": 3,
+                        "yuan_shi": 3,
+                    },
+                },
+            ]
         },
     ]
 }
