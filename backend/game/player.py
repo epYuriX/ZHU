@@ -2,8 +2,8 @@
 class Player:
     """
     游戏内玩家类
-        user_id: 玩家账号 id
         identity: 玩家在局内编号 (P1, P2, P3, P4)
+        user_id: 玩家账号 id
         score: 得分
         current_node: 在地图上的位置
         is_banker: 本回合是否为庄家
@@ -22,8 +22,8 @@ class Player:
     """
 
     def __init__(self, user_id, identity):
-        self.user_id = user_id
         self.identity = identity  # P1, P2, P3, P4
+        self.user_id = user_id
         self.score = 0
         self.money = 0
         self.yuan_yan = 0
@@ -40,4 +40,3 @@ class Player:
         self.current_node = None
         self.is_banker = False
         self.pending_event = None
-

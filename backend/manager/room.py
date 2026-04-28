@@ -125,6 +125,52 @@ class RoomManager:
         if room_id in self.active_rooms:
             del self.active_rooms[room_id]
 
+    async def join_room(self, room_id: str, user_id: int, ws: WebSocket):
+        """
+        玩家加入房间
+        :param room_id: 房间ID
+        :param user_id: 用户ID
+        :param ws: WebSocket连接对象
+        :return:
+        """
+        room = self.get_room(room_id)
+        # 校验
+        if not room:
+            return {
+                "status": "error",
+                "msg": "房间不存在",
+            }
+        if room.status != "waiting":
+            return {
+                "status": "error",
+                "msg": "房间非等待状态，无法加入",
+            }
+        if len(room.players) >= room.max_players:
+            return {
+                "status": "error",
+                "msg": "房间已满",
+            }
+        if any(p["user_id"] == user_id for p in room.players):
+            return {
+                "status": "error",
+                "msg": "你已在房间内"
+            }
+        player_data = {
+            "user_id": user_id,
+            "ws": ws,
+            "is_ready": False,
+        }
+        room.players.append(player_data)
+        await room.broadcast({
+            "type": ServerBroadcast.PLAYER_JOINED,
+            "user_id": user_id,
+            "msg": f"玩家 {user_id} 加入了房间"
+        })
+        return {
+            "status": "success",
+            "room_id": room_id,
+        }
+
     async def leave_room(self, room_id: str, user_id: int):
         """
         退出房间
