@@ -126,31 +126,28 @@ class GameEngine:
 
     async def handle_prep_select(self, ident: str, node_id: int):
         """
-        初始选位 (参数列表完全不传 ID，只传身份代号)
+        初始选位
         :param ident: 玩家身份 (P1-P4)
         :param node_id:
         :return:
         """
-        # 1. 校验阶段
+        # 校验
         if self.phase != "prep":
-            return {"status": "error", "msg": "非准备阶段"}
-
-        # 2. 校验行动权 (检查当前指针是否对应此 ident)
+            return {
+                "status": "error",
+                "msg": "非准备阶段"
+            }
         if ident != self.player_identities[self.turn_index]:
             return {
                 "status": "error",
                 "msg": f"当前应由 {self.player_identities[self.turn_index]} 选位"
             }
-
-        # 3. 节点校验
+        # 节点校验
         node = self.map_manager.get_node_info(node_id)
         if not node or node["id"] not in self.map_manager.initial_optional_ids:
             return {"status": "error", "msg": "不可选择该位置作为起点"}
-
         if node["parking"] != "null":
             return {"status": "error", "msg": "不可选择已有玩家的位置作为起点"}
-
-        # 4. 执行业务逻辑 (完全由 ident 驱动)
         player = self.players[ident]
         player.current_node = node_id
         node["parking"] = ident
