@@ -1,2 +1,4 @@
 # game / data / card / building.py
-BUILDING_CARDS = []
+BUILDING_CARDS = [
+
+]
