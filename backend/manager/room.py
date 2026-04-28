@@ -159,7 +159,7 @@ class RoomManager:
             "is_ready": False,
         }
         room.players.append(player_data)
-        #广播
+        # 广播
         await room.broadcast({
             "type": ServerBroadcast.PLAYER_JOINED,
             "user_id": user_id,

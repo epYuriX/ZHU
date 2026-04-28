@@ -73,7 +73,6 @@ async def ws_join_room(websocket: WebSocket, room_id: str, token: str = Query(..
             elif msg_type == PlayerAction.KICK_PLAYER:
                 target_id = msg_payload.get("target_id")
                 if target_id:
-                    # 注意：Manager里的方法名是 kick_player
                     await room_manager.kick_player(room_id, user_id, target_id)
             # 设置房间模式 (3人/4人)
             elif msg_type == PlayerAction.SET_ROOM_MODE:

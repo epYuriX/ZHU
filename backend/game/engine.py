@@ -8,51 +8,58 @@ from .player import Player
 class GameEngine:
     """
     游戏控制器
-        phase: 当前阶段
+        phase: 当前阶段 (prep / playing)
         current_round: 当前回合数
         ---------------- 玩家管理
-        players: {user_id: Player对象} 玩家实体
-        player_ids: 座位表
-        player_order: 准备阶段操作顺序
-        active_order: 当前回合操作顺序 (随庄家动态调整)
-        trun_index: 当前在该顺序下行动指针 (0-3)
+        players: {ident: Player对象} 玩家实体 (Key 为 P1-P4)
+        player_identities: 座位表 ["P1", "P2", "P3", "P4"]
+        uid_to_ident: 用户ID到身份的映射表 (仅用于初始化和外部查询)
+        active_order: 当前回合操作顺序 (身份标识列表)
+        turn_index: 当前在该顺序下行动指针
         ---------------- 庄家机制
-        current_banker: 本回合庄家ID
-        next_banker: 预设下回合庄家ID
+        current_banker: 本回合庄家身份 (ident)
+        next_banker: 预设下回合庄家身份 (ident)
     """
 
     def __init__(self, user_ids: list):
         """
         游戏初始化
-        :param user_ids:
+        :param user_ids: 外部传入的原始用户ID列表
         """
         self.map_manager = MapManager()
         self.resource_manager = ResourceManager()
-        # 分配顺序
+
+        # 1. 游戏启动瞬间，完成身份锚定
         random.shuffle(user_ids)
-        self.player_ids = user_ids
-        self.player_order = user_ids
+        self.player_identities = [f"P{i + 1}" for i in range(len(user_ids))]
+        self.uid_to_ident = {uid: f"P{i + 1}" for i, uid in enumerate(user_ids)}
+
+        # 2. 初始化玩家实体 (内部逻辑只通过 ident 寻找 Player)
         self.players = {
-            uid: Player(uid, f"P{i + 1}") for i, uid in enumerate(user_ids)
+            ident: Player(self._get_uid_by_ident(ident), ident)
+            for ident in self.player_identities
         }
-        # 庄家初始化
-        self.current_banker = user_ids[0]
-        self.next_banker = user_ids[1]
-        # 流程初始化
+
+        # 3. 庄家初始化 (使用身份标识)
+        self.current_banker = self.player_identities[0]
+        self.next_banker = self.player_identities[1] if len(user_ids) > 1 else self.player_identities[0]
+
+        # 4. 流程初始化
         self.phase = "prep"
         self.current_round = 0
-        self.active_order = []  # 本回合行动顺序
-        self.turn_index = 0  # 回合内玩家指针
-        # 游戏开始时其他操作
-        #
-        #
-        #
-        #
-        #
+        self.active_order = []
+        self.turn_index = 0
+
+    def _get_uid_by_ident(self, ident: str):
+        """内部工具：由身份获取原始UID"""
+        for uid, i in self.uid_to_ident.items():
+            if i == ident:
+                return uid
+        return None
 
     def get_game_state(self):
         """
-        获取游戏快照
+        获取游戏快照 (对外展示时也统一使用 ident)
         """
         return {
             "info": {
@@ -60,10 +67,10 @@ class GameEngine:
                 "round": self.current_round,
                 "banker": self.current_banker,
                 "next_banker": self.next_banker,
-                "active_user": self._get_current_active_user()
+                "active_user": self._get_current_active_ident()
             },
             "players": {
-                uid: {
+                ident: {
                     "identity": p.identity,
                     "pos": p.current_node,
                     "res": {
@@ -71,10 +78,11 @@ class GameEngine:
                         "yuan_yan": p.yuan_yan,
                         "yuan_shi": p.yuan_shi,
                         "yi_tie": p.yi_tie,
-                        "zcys": p.zcys
+                        "zcys": p.zcys,
+                        "score": p.score,
                     },
                     "is_banker": p.is_banker
-                } for uid, p in self.players.items()
+                } for ident, p in self.players.items()
             }
         }
 
@@ -84,17 +92,18 @@ class GameEngine:
         :return:
         """
         self.current_round += 1
-        # 庄家顺位
-        idx = self.player_ids.index(self.current_banker)
-        default_next_idx = (idx + 1) % len(self.player_ids)
-        self.next_banker = self.player_ids[default_next_idx]
-        for uid, p in self.players.items():
-            p.is_banker = (uid == self.current_banker)
-        # 生成本回合行动顺序
-        self.active_order = self.player_ids[idx:] + self.player_ids[:idx]
+        # 庄家顺位逻辑 (基于身份列表)
+        idx = self.player_identities.index(self.current_banker)
+        default_next_idx = (idx + 1) % len(self.player_identities)
+        self.next_banker = self.player_identities[default_next_idx]
+
+        for ident, p in self.players.items():
+            p.is_banker = (ident == self.current_banker)
+
+        # 生成本回合行动顺序 (身份列表)
+        self.active_order = self.player_identities[idx:] + self.player_identities[:idx]
         self.turn_index = 0
         # 回合开始时其他操作
-        #
         #
         #
         #
@@ -112,48 +121,49 @@ class GameEngine:
         #
         #
         #
-        #
         # 下一回合开始
         self.start_new_round()
 
-    async def handle_prep_select(self, user_id: int, node_id: int):
+    async def handle_prep_select(self, ident: str, node_id: int):
         """
-        初始选位
-        :param user_id:
+        初始选位 (参数列表完全不传 ID，只传身份代号)
+        :param ident: 玩家身份 (P1-P4)
         :param node_id:
         :return:
         """
-        # 校验
+        # 1. 校验阶段
         if self.phase != "prep":
+            return {"status": "error", "msg": "非准备阶段"}
+
+        # 2. 校验行动权 (检查当前指针是否对应此 ident)
+        if ident != self.player_identities[self.turn_index]:
             return {
                 "status": "error",
-                "msg": "非准备阶段"
+                "msg": f"当前应由 {self.player_identities[self.turn_index]} 选位"
             }
-        if user_id != self.player_order[self.turn_index]:
-            return {
-                "status": "error",
-                "msg": "请等待其他玩家选位"
-            }
-        # 节点校验
+
+        # 3. 节点校验
         node = self.map_manager.get_node_info(node_id)
         if not node or node["id"] not in self.map_manager.initial_optional_ids:
-            return {
-                "status": "error",
-                "msg": "不可选择该位置作为起点"
-            }
+            return {"status": "error", "msg": "不可选择该位置作为起点"}
+
         if node["parking"] != "null":
-            return {
-                "status": "error",
-                "msg": "不可选择已有玩家的位置作为起点"
-            }
-        # 占领
-        player = self.players[user_id]
+            return {"status": "error", "msg": "不可选择已有玩家的位置作为起点"}
+
+        # 4. 执行业务逻辑 (完全由 ident 驱动)
+        player = self.players[ident]
         player.current_node = node_id
-        node["parking"] = player.identity
-        discovery_result = await self._discover_resource_node(user_id, node_id)
+        node["parking"] = ident
+
+        # 放置初始影响力
+        self._place_influence(ident, node_id)
+
+        # 探索资源
+        discovery_result = await self._discover_resource_node(ident, node_id)
         self.turn_index += 1
-        #
-        if self.turn_index >= len(self.player_ids):
+
+        # 5. 检查是否选位完毕
+        if self.turn_index >= len(self.player_identities):
             self.phase = "playing"
             self.start_new_round()
             return {
@@ -162,40 +172,46 @@ class GameEngine:
                 "discovery": discovery_result,
                 "next_phase": "playing"
             }
+
         card_name = discovery_result.get("card_name", "未知资源") if discovery_result else "未知资源"
         return {
             "status": "success",
-            "msg": f"选位成功，你发现了: {card_name}",
+            "msg": f"身份 {ident} 选位成功，发现了: {card_name}",
             "discovery": discovery_result,
-            "next_player": self.player_order[self.turn_index]
+            "next_player": self.player_identities[self.turn_index]
         }
 
-    def _get_current_active_user(self):
+    def _get_current_active_ident(self):
         """
-        确定当前行动玩家
+        确定当前行动玩家身份
         :return:
         """
-        order = self.player_order if self.phase == "prep" else self.active_order
+        order = self.player_identities if self.phase == "prep" else self.active_order
         return order[self.turn_index] if self.turn_index < len(order) else None
 
-    async def _discover_resource_node(self, user_id: int, node_id: int):
+    # --- 底层私有方法：全参数 ident 化 ---
+
+    async def _discover_resource_node(self, ident: str, node_id: int):
         """
         探索资源点
-        :param user_id:
+        :param ident:
         :param node_id:
         :return:
         """
-        player = self.players.get(user_id)
+        player = self.players.get(ident)
         node = self.map_manager.get_node_info(node_id)
         if node.get("resource") != "null":
             return None
+
         level = f"lv{node['lv']}"
         card = self.resource_manager.draw_resource_card(level)
         if not card:
             return None
+
         # 设置资源点类型
         node["resource"] = card["map_attribute"]["resource"]
         node["resource_c"] = card["map_attribute"]["resource_c"]
+
         event_data = {
             "node_id": node_id,
             "card_name": card["name"],
@@ -205,12 +221,11 @@ class GameEngine:
         player.pending_event = event_data
         return event_data
 
-    def _place_influence(self, user_id: int, node_id: int):
+    def _place_influence(self, ident: str, node_id: int):
         """
         在指定地点放置影响力
-        :return:
         """
-        player = self.players.get(user_id)
+        player = self.players.get(ident)
         node = self.map_manager.get_node_info(node_id)
         if node["inf_1"] == "null":
             node["inf_1"] = player.identity
@@ -220,58 +235,39 @@ class GameEngine:
             return True
         return False
 
-    def _remove_influence(self, node_id: int, target_identity: str):
+    def _remove_influence(self, node_id: int, target_ident: str):
         """
         移除影响力
-        :param node_id:
-        :param target_identity:
-        :return:
+        :param target_ident: 目标身份字符串
         """
         node = self.map_manager.get_node_info(node_id)
-        if node["inf_1"] == target_identity:
+        if node["inf_1"] == target_ident:
             node["inf_1"] = "null"
             return True
-        elif node["inf_2"] == target_identity:
+        elif node["inf_2"] == target_ident:
             node["inf_2"] = "null"
             return True
         return False
 
-    def _relace_influence(self, user_id: int, node_id: int, target_identity: str):
+    def _replace_influence(self, attacker_ident: str, node_id: int, defender_ident: str):
         """
-        将节点上属于 target_identity 的影响力替换为 user_id 的
-        :param user_id:
-        :param node_id:
-        :param target_identity:
-        :return:
+        替换影响力
         """
-        player = self.players.get(user_id)
-        node = self.map_manager.get_node_info(node_id)
-        if node["inf_1"] == target_identity:
-            node["inf_1"] = player.identity
-            return True
-        elif node["inf_2"] == target_identity:
-            node["inf_2"] = player.identity
+        if self._remove_influence(node_id, defender_ident):
+            return self._place_influence(attacker_ident, node_id)
+        return False
+
+    def _move_influence(self, ident: str, from_node_id: int, to_node_id: int):
+        """
+        移动影响力
+        """
+        if self._place_influence(ident, to_node_id):
+            self._remove_influence(from_node_id, ident)
             return True
         return False
 
-    def _move_influence(self, user_id: int, from_node_id: int, to_node_id: int):
+    def skill_steal_banker(self, thief_ident: str):
         """
-        将自己的影响力从 A 点移到 B 点
-        :param user_id:
-        :param from_node_id:
-        :param to_node_id:
-        :return:
+        切换下回合庄家身份
         """
-        player = self.players[user_id]
-        if self._place_influence(user_id, to_node_id):
-            self._remove_influence(from_node_id, player.identity)
-            return True
-        return False
-
-    def skill_steal_banker(self, thief_id: int):
-        """
-        切换 banker
-        :param thief_id:
-        :return:
-        """
-        self.next_banker = thief_id
+        self.next_banker = thief_ident
