@@ -19,7 +19,7 @@ class ResourceManager:
 
     def draw_resource_card(self, lv: str):
         """
-        抽卡
+        抽卡，抽完不放回
         :param lv:
         :return:
         """

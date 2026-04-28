@@ -7,6 +7,7 @@ class Player:
         score: 得分
         current_node: 在地图上的位置
         is_banker: 本回合是否为庄家
+        pending_event: 待处理事件
         ---------------- 货币 / 资源
         money: 钱币
         yuan_yan: 源岩
@@ -38,3 +39,5 @@ class Player:
         ]
         self.current_node = None
         self.is_banker = False
+        self.pending_event = None
+
