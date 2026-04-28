@@ -4,6 +4,10 @@ import random
 
 
 class ResourceManager:
+    """
+    抽取资源卡
+    """
+
     def __init__(self):
         self.pools = {
             "lv1": RESOURCE_CARDS["lv1"].copy(),
