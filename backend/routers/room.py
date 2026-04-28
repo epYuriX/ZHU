@@ -22,7 +22,7 @@ async def list_rooms():
 @router.websocket("/ws/{room_id}")
 async def ws_join_room(websocket: WebSocket, room_id: str, token: str = Query(...)):
     """
-    加入房间 WebSocket 完整实现
+    加入房间 WebSocket
     """
     # 鉴权
     payload = verify_token(token)
@@ -33,7 +33,7 @@ async def ws_join_room(websocket: WebSocket, room_id: str, token: str = Query(..
     # 调用管理器逻辑进行加入校验与入库
     result = await room_manager.join_room(room_id, user_id, websocket)
     if result["status"] == "error":
-        # 如果校验失败（如房满），先 accept 再发错误消息，最后 close
+        # 如果校验失败
         await websocket.accept()
         await websocket.send_json({
             "type": ServerMessage.ERROR,
