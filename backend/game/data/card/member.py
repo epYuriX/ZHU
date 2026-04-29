@@ -1,4 +1,4 @@
-# game / data / card / member.py
+# game/data/card/member.py
 MEMBER_CARDS = [
     {
         "id": 1,

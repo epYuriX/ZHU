@@ -1,4 +1,4 @@
-# game / engine.py
+# game/engine.py
 import random
 from .map_manager import MapManager
 from .resource_manager import ResourceManager

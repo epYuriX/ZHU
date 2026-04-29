@@ -1,9 +1,11 @@
-# game / action.py
+# game/engine/action_builder.py
 class Action:
     """
     玩家行动类
         action_cnt: 主要行动使用次数
         skill_cnt: 角色技能使用次数
+        skill_1_cnt: 策略使用次数
+        skill_2_cnt: 计谋使用次数
     玩家行动说明
         主要行动 (6选1)
             部署: [放置影响力]
@@ -20,6 +22,8 @@ class Action:
     def __init__(self):
         self.action_cnt = 0
         self.skill_cnt = 0
+        self.skill_1_cnt = 0
+        self.skill_2_cnt = 0
         pass
 
     def deploy(self):
@@ -27,6 +31,7 @@ class Action:
         部署
         :return:
         """
+        self.action_cnt += 1
         pass
 
     def dispatch(self):
@@ -34,6 +39,7 @@ class Action:
         调度
         :return:
         """
+        self.action_cnt += 1
         pass
 
     def explore(self):
@@ -41,6 +47,7 @@ class Action:
         探索
         :return:
         """
+        self.action_cnt += 1
         pass
 
     def move(self):
@@ -48,6 +55,7 @@ class Action:
         移动
         :return:
         """
+        self.action_cnt += 1
         pass
 
     def build(self):
@@ -55,6 +63,7 @@ class Action:
         建设
         :return:
         """
+        self.action_cnt += 1
         pass
 
     def special(self):
@@ -62,6 +71,7 @@ class Action:
         特殊行动
         :return:
         """
+        self.action_cnt += 1
         pass
 
     def skill(self):
@@ -69,6 +79,7 @@ class Action:
         使用角色牌
         :return:
         """
+        self.skill_cnt += 1
         pass
 
     def declare(self):
