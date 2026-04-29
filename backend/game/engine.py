@@ -13,12 +13,12 @@ class GameEngine:
         ---------------- 玩家管理
         players: {ident: Player对象} 玩家实体 (Key 为 P1-P4)
         player_identities: 座位表 ["P1", "P2", "P3", "P4"]
-        uid_to_ident: 用户ID到身份的映射表 (仅用于初始化和外部查询)
-        active_order: 当前回合操作顺序 (身份标识列表)
+        uid_to_ident: 用户ID到身份的映射表
+        active_order: 当前回合操作顺序
         turn_index: 当前在该顺序下行动指针
         ---------------- 庄家机制
-        current_banker: 本回合庄家身份 (ident)
-        next_banker: 预设下回合庄家身份 (ident)
+        current_banker: 本回合庄家身份
+        next_banker: 预设下回合庄家身份
     """
 
     def __init__(self, user_ids: list):
@@ -29,22 +29,19 @@ class GameEngine:
         self.map_manager = MapManager()
         self.resource_manager = ResourceManager()
 
-        # 1. 游戏启动瞬间，完成身份锚定
+        # 游戏启动瞬间，完成身份锚定
         random.shuffle(user_ids)
         self.player_identities = [f"P{i + 1}" for i in range(len(user_ids))]
         self.uid_to_ident = {uid: f"P{i + 1}" for i, uid in enumerate(user_ids)}
-
-        # 2. 初始化玩家实体 (内部逻辑只通过 ident 寻找 Player)
+        # 初始化玩家实体
         self.players = {
             ident: Player(self._get_uid_by_ident(ident), ident)
             for ident in self.player_identities
         }
-
-        # 3. 庄家初始化 (使用身份标识)
+        # 庄家初始化
         self.current_banker = self.player_identities[0]
-        self.next_banker = self.player_identities[1] if len(user_ids) > 1 else self.player_identities[0]
-
-        # 4. 流程初始化
+        self.next_banker = self.player_identities[1]
+        # 流程初始化
         self.phase = "prep"
         self.current_round = 0
         self.active_order = []
@@ -59,7 +56,7 @@ class GameEngine:
 
     def get_game_state(self):
         """
-        获取游戏快照 (对外展示时也统一使用 ident)
+        获取游戏快照
         """
         return {
             "info": {
@@ -92,15 +89,13 @@ class GameEngine:
         :return:
         """
         self.current_round += 1
-        # 庄家顺位逻辑 (基于身份列表)
+        # 庄家顺位逻辑
         idx = self.player_identities.index(self.current_banker)
         default_next_idx = (idx + 1) % len(self.player_identities)
         self.next_banker = self.player_identities[default_next_idx]
-
         for ident, p in self.players.items():
             p.is_banker = (ident == self.current_banker)
-
-        # 生成本回合行动顺序 (身份列表)
+        # 生成本回合行动顺序
         self.active_order = self.player_identities[idx:] + self.player_identities[:idx]
         self.turn_index = 0
         # 回合开始时其他操作
@@ -151,14 +146,9 @@ class GameEngine:
         player = self.players[ident]
         player.current_node = node_id
         node["parking"] = ident
-
-        # 放置初始影响力
-        self._place_influence(ident, node_id)
-
         # 探索资源
         discovery_result = await self._discover_resource_node(ident, node_id)
         self.turn_index += 1
-
         # 5. 检查是否选位完毕
         if self.turn_index >= len(self.player_identities):
             self.phase = "playing"
@@ -186,8 +176,6 @@ class GameEngine:
         order = self.player_identities if self.phase == "prep" else self.active_order
         return order[self.turn_index] if self.turn_index < len(order) else None
 
-    # --- 底层私有方法：全参数 ident 化 ---
-
     async def _discover_resource_node(self, ident: str, node_id: int):
         """
         探索资源点
@@ -199,16 +187,13 @@ class GameEngine:
         node = self.map_manager.get_node_info(node_id)
         if node.get("resource") != "null":
             return None
-
         level = f"lv{node['lv']}"
         card = self.resource_manager.draw_resource_card(level)
         if not card:
             return None
-
         # 设置资源点类型
         node["resource"] = card["map_attribute"]["resource"]
         node["resource_c"] = card["map_attribute"]["resource_c"]
-
         event_data = {
             "node_id": node_id,
             "card_name": card["name"],
