@@ -19,6 +19,21 @@ class GameEngine:
         ---------------- 庄家机制
         current_banker: 本回合庄家身份
         next_banker: 预设下回合庄家身份
+    方法目录
+        __init__(user_ids): 游戏初始化
+        _get_uid_by_ident(ident): Px -> UID
+        get_game_state(): 获取游戏快照
+        start_new_round(): 进入新回合
+        finish_round(): 回合结束
+        handle_prep_select(ident, node_id): 初始选位
+        _get_current_active_ident(): 确定当前行动玩家身份
+        _discover_resource_node(ident, node_id): 探索资源点
+        _place_influence(ident, node_id): 放置影响力
+        _remove_influence(node_id, target_ident): 移除影响力
+        _replace_influence(node_id, attacker_ident, defender_ident): 替换影响力
+        _move_influence(node_id, from_node_id, to_node_id): 移动影响力
+        skill_steal_banker(thief_ident): 切换庄家
+
     """
 
     def __init__(self, user_ids: list):
@@ -119,11 +134,19 @@ class GameEngine:
         # 下一回合开始
         self.start_new_round()
 
+    def player_operation(self, ident: str, opt):
+        """
+        玩家操作
+        :return:
+        """
+        pass
+
     async def handle_prep_select(self, ident: str, node_id: int):
         """
-        初始选位
-        :param ident: 玩家身份 (P1-P4)
-        :param node_id:
+        玩家选择初始位置
+        玩家 ident 选择1级资源点 node_id 作为初始位置
+        :param ident: 玩家身份(P1 - P4)
+        :param node_id: 该玩家选择的位置
         :return:
         """
         # 校验
@@ -179,6 +202,7 @@ class GameEngine:
     async def _discover_resource_node(self, ident: str, node_id: int):
         """
         探索资源点
+        玩家 ident 探索资源点 node_id
         :param ident:
         :param node_id:
         :return:
@@ -186,8 +210,11 @@ class GameEngine:
         player = self.players.get(ident)
         node = self.map_manager.get_node_info(node_id)
         if node.get("resource") != "null":
+            # 资源点已被探索过
             return None
+        # 获取资源点等级
         level = f"lv{node['lv']}"
+        # 抽取资源卡
         card = self.resource_manager.draw_resource_card(level)
         if not card:
             return None
@@ -203,12 +230,13 @@ class GameEngine:
         player.pending_event = event_data
         return event_data
 
-    def _place_influence(self, ident: str, node_id: int):
+    def _place_influence(self, node_id: int, ident: str):
         """
         在指定地点放置影响力
+        在 node_id 位置上放置一个玩家 ident 的影响力
         """
-        player = self.players.get(ident)
         node = self.map_manager.get_node_info(node_id)
+        player = self.players.get(ident)
         if node["inf_1"] == "null":
             node["inf_1"] = player.identity
             return True
@@ -220,7 +248,8 @@ class GameEngine:
     def _remove_influence(self, node_id: int, target_ident: str):
         """
         移除影响力
-        :param target_ident: 目标身份字符串
+        移除 node_id 位置上玩家 targer_ident 的一个影响力
+        :param target_ident: 目标身份
         """
         node = self.map_manager.get_node_info(node_id)
         if node["inf_1"] == target_ident:
@@ -231,9 +260,10 @@ class GameEngine:
             return True
         return False
 
-    def _replace_influence(self, attacker_ident: str, node_id: int, defender_ident: str):
+    def _replace_influence(self, node_id: int, defender_ident: str, attacker_ident: str):
         """
         替换影响力
+        将 node_id 位置上玩家 defender_ident 的影响力替换为玩家 attacker_ident 的影响力
         """
         if self._remove_influence(node_id, defender_ident):
             return self._place_influence(attacker_ident, node_id)
@@ -242,14 +272,15 @@ class GameEngine:
     def _move_influence(self, ident: str, from_node_id: int, to_node_id: int):
         """
         移动影响力
+        将 ident 的影响力从 from_node_id 移动到 to_node_id
         """
         if self._place_influence(ident, to_node_id):
             self._remove_influence(from_node_id, ident)
             return True
         return False
 
-    def skill_steal_banker(self, thief_ident: str):
+    def skill_steal_banker(self, ident: str):
         """
-        切换下回合庄家身份
+        强制切换下回合庄家身份
         """
-        self.next_banker = thief_ident
+        self.next_banker = ident
