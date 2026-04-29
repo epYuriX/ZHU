@@ -28,11 +28,12 @@ class GameEngine:
         handle_prep_select(ident, node_id): 初始选位
         _get_current_active_ident(): 确定当前行动玩家身份
         _discover_resource_node(ident, node_id): 探索资源点
+        skill_steal_banker(thief_ident): 切换庄家
+        ---------------- 影响力相关
         _place_influence(ident, node_id): 放置影响力
         _remove_influence(node_id, target_ident): 移除影响力
         _replace_influence(node_id, attacker_ident, defender_ident): 替换影响力
         _move_influence(node_id, from_node_id, to_node_id): 移动影响力
-        skill_steal_banker(thief_ident): 切换庄家
 
     """
 
@@ -43,7 +44,6 @@ class GameEngine:
         """
         self.map_manager = MapManager()
         self.resource_manager = ResourceManager()
-
         # 游戏启动瞬间，完成身份锚定
         random.shuffle(user_ids)
         self.player_identities = [f"P{i + 1}" for i in range(len(user_ids))]
