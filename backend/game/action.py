@@ -2,6 +2,8 @@
 class Action:
     """
     玩家行动类
+        action_cnt: 主要行动使用次数
+        skill_cnt: 角色技能使用次数
     玩家行动说明
         主要行动 (6选1)
             部署: [放置影响力]
@@ -16,6 +18,62 @@ class Action:
     """
 
     def __init__(self):
+        self.action_cnt = 0
+        self.skill_cnt = 0
         pass
 
-    
+    def deploy(self):
+        """
+        部署
+        :return:
+        """
+        pass
+
+    def dispatch(self):
+        """
+        调度
+        :return:
+        """
+        pass
+
+    def explore(self):
+        """
+        探索
+        :return:
+        """
+        pass
+
+    def move(self):
+        """
+        移动
+        :return:
+        """
+        pass
+
+    def build(self):
+        """
+        建设
+        :return:
+        """
+        pass
+
+    def special(self):
+        """
+        特殊行动
+        :return:
+        """
+        pass
+
+    def skill(self):
+        """
+        使用角色牌
+        :return:
+        """
+        pass
+
+    def declare(self):
+        """
+        宣告城市样式
+        :return:
+        """
+        pass
