@@ -96,7 +96,7 @@ ROLE_CARDS = [
         "name": "锡人",
         "enterprise": False,
         "camp": "dafault",
-        "describe": "#",
+        "describe": "“一位侦探？”",
         "skill": [
             {
                 "type": "策略",
@@ -119,8 +119,18 @@ ROLE_CARDS = [
         "enterprise": True,
         "camp": "dafault",
         "describe": "#",
-        "strategy": {},
-        "scheme": {}
+        "skill": [
+            {
+                "type": "策略",
+                "name": "",
+                "describe": ""
+            },
+            {
+                "type": "计谋",
+                "name": "",
+                "describe": ""
+            },
+        ]
     },
     {
         "id": 7,
@@ -128,8 +138,18 @@ ROLE_CARDS = [
         "enterprise": True,
         "camp": "dafault",
         "describe": "#",
-        "strategy": {},
-        "scheme": {}
+        "skill": [
+            {
+                "type": "策略",
+                "name": "",
+                "describe": ""
+            },
+            {
+                "type": "计谋",
+                "name": "",
+                "describe": ""
+            },
+        ]
     },
     {
         "id": 8,
@@ -137,8 +157,18 @@ ROLE_CARDS = [
         "enterprise": True,
         "camp": "RHODES_ISLAND",
         "describe": "#",
-        "strategy": {},
-        "scheme": {}
+        "skill": [
+            {
+                "type": "策略",
+                "name": "",
+                "describe": ""
+            },
+            {
+                "type": "计谋",
+                "name": "",
+                "describe": ""
+            },
+        ]
     },
     {
         "id": 9,
@@ -146,8 +176,18 @@ ROLE_CARDS = [
         "enterprise": True,
         "camp": "RHODES_ISLAND",
         "describe": "#",
-        "strategy": {},
-        "scheme": {}
+        "skill": [
+            {
+                "type": "策略",
+                "name": "",
+                "describe": ""
+            },
+            {
+                "type": "计谋",
+                "name": "",
+                "describe": ""
+            },
+        ]
     },
     {
         "id": 10,
@@ -155,8 +195,18 @@ ROLE_CARDS = [
         "enterprise": True,
         "camp": "RHODES_ISLAND",
         "describe": "#",
-        "strategy": {},
-        "scheme": {}
+        "skill": [
+            {
+                "type": "策略",
+                "name": "",
+                "describe": ""
+            },
+            {
+                "type": "计谋",
+                "name": "",
+                "describe": ""
+            },
+        ]
     },
     {
         "id": 11,
@@ -164,8 +214,18 @@ ROLE_CARDS = [
         "enterprise": True,
         "camp": "RHODES_ISLAND",
         "describe": "#",
-        "strategy": {},
-        "scheme": {}
+        "skill": [
+            {
+                "type": "策略",
+                "name": "",
+                "describe": ""
+            },
+            {
+                "type": "计谋",
+                "name": "",
+                "describe": ""
+            },
+        ]
     },
     {
         "id": 12,
@@ -173,8 +233,18 @@ ROLE_CARDS = [
         "enterprise": True,
         "camp": "RHODES_ISLAND",
         "describe": "#",
-        "strategy": {},
-        "scheme": {}
+        "skill": [
+            {
+                "type": "策略",
+                "name": "",
+                "describe": ""
+            },
+            {
+                "type": "计谋",
+                "name": "",
+                "describe": ""
+            },
+        ]
     },
     {
         "id": 13,
@@ -182,8 +252,18 @@ ROLE_CARDS = [
         "enterprise": True,
         "camp": "RHODES_ISLAND",
         "describe": "#",
-        "strategy": {},
-        "scheme": {}
+        "skill": [
+            {
+                "type": "策略",
+                "name": "",
+                "describe": ""
+            },
+            {
+                "type": "计谋",
+                "name": "",
+                "describe": ""
+            },
+        ]
     },
     {
         "id": 14,
@@ -191,8 +271,18 @@ ROLE_CARDS = [
         "enterprise": True,
         "camp": "RHODES_ISLAND",
         "describe": "#",
-        "strategy": {},
-        "scheme": {}
+        "skill": [
+            {
+                "type": "策略",
+                "name": "",
+                "describe": ""
+            },
+            {
+                "type": "计谋",
+                "name": "",
+                "describe": ""
+            },
+        ]
     },
     {
         "id": 15,
@@ -200,8 +290,18 @@ ROLE_CARDS = [
         "enterprise": True,
         "camp": "RHODES_ISLAND",
         "describe": "#",
-        "strategy": {},
-        "scheme": {}
+        "skill": [
+            {
+                "type": "策略",
+                "name": "",
+                "describe": ""
+            },
+            {
+                "type": "计谋",
+                "name": "",
+                "describe": ""
+            },
+        ]
     },
 ]
 # 标准版只有这五个角色
