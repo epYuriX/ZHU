@@ -1,4 +1,6 @@
 # game/system/map_manager.py
+from sqlalchemy.testing import fails
+
 from game.entity.map import *
 
 
@@ -39,12 +41,10 @@ class MapManager:
         :return: 是否成功放置
         """
         node = self.nodes[nid]
-        if node.type != "node":
-            return False
         if node.inf_1 == "null":
             node.inf_1 = ident
             return True
-        elif node.int_c >= 1 and node.inf_2 == "null":
+        elif node.int_c > 1 and node.inf_2 == "null":
             node.inf_2 = ident
             return True
         return False
@@ -60,7 +60,7 @@ class MapManager:
         if node.inf_1 == ident:
             node.inf_1 = "null"
             return True
-        elif node.inf_2 == ident:
+        elif node.inf_c > 1 and node.inf_2 == ident:
             node.inf_2 = "null"
             return True
         return False
@@ -90,7 +90,50 @@ class MapManager:
         if node.inf_1 == ident:
             node.inf_1 = ident_new
             return True
-        elif node_c >= 1 and node.inf_2 == ident:
+        elif node_c > 1 and node.inf_2 == ident:
             node.inf_2 = ident_new
             return True
+        return False
+
+    def put_player(self, nid, ident) -> bool:
+        """
+        放置玩家角色
+        :param nid:
+        :param ident:
+        :return:
+        """
+        node = self.nodes[nid]
+        if node.type != "node":
+            return False
+        if node.parking != "null":
+            return False
+        node.parking = ident
+        return True
+
+    def del_player(self, nid, ident) -> bool:
+        """
+        移除玩家角色
+        :param nid:
+        :param ident:
+        :return:
+        """
+        node = self.nodes[nid]
+        if node.type != "node":
+            return False
+        if node.parking != ident:
+            return False
+        node.parking = "null"
+        return True
+
+    def move_player(self, ident, nid, nid_new) -> bool:
+        """
+        移动玩家角色
+        :param ident:
+        :param nid:
+        :param nid_new:
+        :return:
+        """
+        if self.del_player(nid, ident):
+            if self.put_player(nid_new, ident):
+                return True
         return False
