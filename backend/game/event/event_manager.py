@@ -1,18 +1,18 @@
-# game / resource_manager.py
-from .data import RESOURCE_CARDS
+# game/event/event_manager.py
+from .events import EVENTS
 import random
 
 
-class ResourceManager:
+class EventManager:
     """
     抽取资源卡
     """
 
     def __init__(self):
         self.pools = {
-            "lv1": list(RESOURCE_CARDS["lv1"]),
-            "lv2": list(RESOURCE_CARDS["lv2"]),
-            "lv3": list(RESOURCE_CARDS["lv3"])
+            "lv1": list(EVENTS["lv1"]),
+            "lv2": list(EVENTS["lv2"]),
+            "lv3": list(EVENTS["lv3"])
         }
         for lv in self.pools:
             random.shuffle(self.pools[lv])

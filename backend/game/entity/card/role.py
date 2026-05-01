@@ -1,5 +1,5 @@
-# game/data/card/member.py
-MEMBER_CARDS = [
+# game/data/card/role.py
+ROLE_CARDS = [
     {
         "id": 1,
         "name": "极境",
@@ -136,3 +136,6 @@ MEMBER_CARDS = [
         "scheme": {}
     },
 ]
+# 标准版只有这五个角色
+STANDARD = [1, 2, 3, 4, 5]
+

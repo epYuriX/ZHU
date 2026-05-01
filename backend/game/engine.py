@@ -1,8 +1,8 @@
 # game/engine.py
 import random
-from .map_manager import MapManager
-from .resource_manager import ResourceManager
-from .player import Player
+from game.system.map_manager import MapManager
+from game.event.event_manager import ResourceManager
+from game.entity.player import Player
 
 
 class GameEngine:

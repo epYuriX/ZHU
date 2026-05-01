@@ -6,4 +6,11 @@ class ActionManager:
     def __init__(self):
         self.actions = {}
 
+    def select_role_cards(self, ident):
+        """
+        盖放角色牌
+        :param ident:
+        :return:
+        """
+        pass
 

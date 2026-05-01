@@ -1,7 +1,7 @@
 # game / map_manager.py
 from platform import node
 
-from .data.map_config import (
+from game.data.map_config import (
     NODE_DATAILS_4,
     ADJACENCY_LIST_4,
     ADJACENCY_LIST_APPEND_4,

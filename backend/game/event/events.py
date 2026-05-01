@@ -1,5 +1,5 @@
-# game / data / card / resource.py
-RESOURCE_CARDS = {
+# game/event/events.py
+EVENTS = {
     "lv1": [
         {
             "name": "中立采石场",

@@ -1,4 +1,4 @@
-# game / engine / round.py
+# game/engine/round.py
 class Round:
     """
     回合类
@@ -7,6 +7,7 @@ class Round:
         current_cycle: 当前是第几轮
         turn_index: 行动玩家指针
         finished: 是否所有玩家行动结束
+        phase: 阶段 start -> action -> end
     // 回合说明
         1. 角色牌盖放
         2. 玩家行动 (2轮)
@@ -14,22 +15,20 @@ class Round:
         4. 收尾
     """
 
-    def __init__(self, order: list[str]):
+    def __init__(self, engine, order: list[str]):
         """
         # 初始化
+        :param engine: GameEngine 实例
         :param order: 行动顺序
-        :param banker: 当前回合庄家
         """
         # 数据初始化
+        self.engine = engine
         self.order = order
         self.current_cycle = 1
         self.cycles = 2
         self.turn_index = 0
         self.finished = False
-        print("--- * 回合开始 * ---")
-        print("本回合行动顺序为：")
-        for i in order:
-            print(i, end=" ")
+        self.phase = "start"
 
     def get_current_player(self):
         """
@@ -40,6 +39,18 @@ class Round:
             return None
         return self.order[self.turn_index]
 
+    def start_phase(self):
+        """
+        回合开始时
+        """
+        # 回合开始时操作
+        # 1. 盖放角色牌
+        self.phase = "action"
+        self.engine.event_manager.dispatch(
+
+        )
+        pass
+
     def next_turn(self):
         """
         回合推进
@@ -49,38 +60,25 @@ class Round:
             self.turn_index = 0
             self.current_cycle += 1
             if self.current_cycle > self.cycles:
-                self.finished = True
+                self.phase = "end"
 
-    def on_round_start(self):
-        """
-        回合开始时
-        """
-        pass
-
-    def on_round_end(self):
+    def end_phase(self):
         """
         回合结束
         """
+        # 回合结束时操作
+        # 其它回合结束时操作队列[]
+        # 如确认下回合庄家等
         # 收资源
+        #
+        #
+        #
+        self.finished = True
         pass
 
     def player_action(self, ident):
         """
         玩家行动
         :param ident:
-        """
-        pass
-
-    def select_member(self):
-        """
-        角色牌盖放
-        :return:
-        """
-        pass
-
-    def collect_resources(self):
-        """
-        采集资源
-        :return:
         """
         pass
