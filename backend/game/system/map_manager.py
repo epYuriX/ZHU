@@ -1,6 +1,5 @@
 # game/system/map_manager.py
 from sqlalchemy.testing import fails
-
 from game.entity.map import *
 
 
@@ -95,6 +94,19 @@ class MapManager:
             return True
         return False
 
+    def del_other_inf(self, nid, ident):
+        """
+        移除其它玩家的影响力
+        :param nid:
+        :param ident:
+        :return:
+        """
+        node = self.nodes[nid]
+        if node.inf_1 != ident:
+            node.inf_1 = "null"
+        if node.inf_c > 1 and node.inf_2 != ident:
+            node.inf_2 = "null"
+
     def put_player(self, nid, ident) -> bool:
         """
         放置玩家角色
@@ -125,15 +137,21 @@ class MapManager:
         node.parking = "null"
         return True
 
-    def move_player(self, ident, nid, nid_new) -> bool:
+    def move_player(self, ident, nid, by, nid_new) -> bool:
         """
         移动玩家角色
         :param ident:
         :param nid:
+        :param by: 经过的路径
         :param nid_new:
         :return:
         """
-        if self.del_player(nid, ident):
-            if self.put_player(nid_new, ident):
-                return True
+        link = next((i for i in self.links[nid] if i['id'] == nid_new and i['by'] == by), False)
+        if link:
+            if self.del_player(nid, ident):
+                if self.put_player(nid_new, ident):
+                    self.del_other_inf(link.id, ident)
+                    self.del_other_inf(link.by, ident)
+                    self.put_inf(nid, ident)
+                    return True
         return False
