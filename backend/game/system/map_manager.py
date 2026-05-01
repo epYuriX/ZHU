@@ -1,5 +1,4 @@
 # game/system/map_manager.py
-from sqlalchemy.testing import fails
 from game.entity.map import *
 
 
@@ -20,17 +19,40 @@ class MapManager:
             inf_1: # 影响力1所属方
             inf_2: # 影响力2所属方
         links[]: 链路信息
+        map{}: 完整地图
+    方法列表
+        __init__(): 初始化
+        update(): 更新地图
+        ---------------- 影响力相关
+        put_inf(): 放置影响力
+        del_inf(): 移除影响力
+        move_inf(): 移动影响力
+        replace_inf(): 替换影响力
+        del_other_inf(): 移除其他势力的影响力
+        ---------------- 移动城市相关
+        put_player(): 放置移动城市
+        del_inf(): 移除移动城市
+        move_inf(): 移动移动城市
+        ---------------- 节点相关
+        set_node_type(): 设置资源点类型
+        adjacent_nodes(): 获取相邻节点列表
+        adjacent_resource(): 获取相邻资源点列表
     """
 
     def __init__(self):
+        """
+        初始化
+        """
         self.nodes = NODE_DATAILS_4
         self.links = ADJACENCY_LIST_4
+        self.map = MAP_4
 
     def update(self):
         """
         更新地图
         """
         self.links = ADJACENCY_LIST_APPEND_4
+        self.map = MAP_APPEND_4
 
     def put_inf(self, nid, ident) -> bool:
         """
@@ -96,7 +118,7 @@ class MapManager:
 
     def del_other_inf(self, nid, ident):
         """
-        移除其它玩家的影响力
+        移除其他势力的影响力
         :param nid:
         :param ident:
         :return:
@@ -155,3 +177,39 @@ class MapManager:
                     self.put_inf(nid, ident)
                     return True
         return False
+
+    def set_node_type(self, nid, res, res_c) -> bool:
+        """
+        设置节点的资源类型
+        :param nid:
+        :param res:
+        :param res_c:
+        :return:
+        """
+        node = self.nodes[nid]
+        if node.type != "node":
+            return False
+        if node.resource != "null":
+            return False
+        node.resource = res
+        node.resource_c = res_c
+        return True
+
+    def adjacent_nodes(self, nid) -> list:
+        """
+        相邻节点
+        :param nid:
+        :return:
+        """
+        return self.map[nid]
+
+    def adjacent_resource(self, nid):
+        """
+        相邻资源点
+        :param nid:
+        :return:
+        """
+        node = self.nodes[nid]
+        if node.type != "node":
+            return False
+        return list({i["id"] for i in self.links[nid]})
