@@ -1,77 +1,96 @@
 # game/system/map_manager.py
-
-from game.data.map_config import (
-    NODE_DATAILS_4,
-    ADJACENCY_LIST_4,
-    ADJACENCY_LIST_APPEND_4,
-    OPTIONAL_4
-)
+from game.entity.map import *
 
 
 class MapManager:
     """
-    地图管理器
+    地图控制器
+        nodes[]: 节点信息
+            id: 节点 id
+            type: 节点类型 node - 资源点, link - 通道
+            lv: 节点等级
+            name: 节点名
+            area: 所属区块
+            color: 所属区颜色
+            resource: # 资源类型
+            resource_c: # 资源乘数
+            parking: # 存在玩家所属方
+            inf_c: # 影响力棋子容量
+            inf_1: # 影响力1所属方
+            inf_2: # 影响力2所属方
+        links[]: 链路信息
     """
 
     def __init__(self):
-        self.nodes = {
-            node["id"]: node for node in NODE_DATAILS_4
-        }
-        self.base_adj = ADJACENCY_LIST_4
-        self.full_adj = ADJACENCY_LIST_APPEND_4
-        self.initial_optional_ids = OPTIONAL_4
+        self.nodes = NODE_DATAILS_4
+        self.links = ADJACENCY_LIST_4
 
-    def get_node_info(self, node_id: int):
+    def update(self):
         """
-        获取节点信息
-        :param node_id:
-        :return:
+        更新地图
         """
-        return self.nodes.get(node_id)
+        self.links = ADJACENCY_LIST_APPEND_4
 
-    def get_setup_options(self):
+    def put_inf(self, nid, ident) -> bool:
         """
-        获取可选点列表
-        :return:
+        放置影响力
+        :param nid: 节点 id
+        :param ident: 玩家身份
+        :return: 是否成功放置
         """
-        options = []
-        for n_id in self.initial_optional_ids:
-            node = self.get_node_info(n_id)
-            if node and node.get("parking") == "null":
-                options.append(node)
-        return options
-
-    def update_node_oarking(self, node_id: int, player_identity: str):
-        """
-        更新节点占领状态
-        :param node_id:
-        :param player_identity:
-        :return:
-        """
-        if node_id in self.nodes:
-            self.nodes[node_id]["parking"] = player_identity
+        node = self.nodes[nid]
+        if node.type != "node":
+            return False
+        if node.inf_1 == "null":
+            node.inf_1 = ident
+            return True
+        elif node.int_c >= 1 and node.inf_2 == "null":
+            node.inf_2 = ident
             return True
         return False
 
-    def get_movable_nodes(self, current_node_id: int, current_round: int):
+    def del_inf(self, nid, ident) -> bool:
         """
-        可移动列表
-        :param current_node_id:
-        :param current_round:
+        移除影响力
+        :param nid:
+        :param ident:
         :return:
         """
-        active_list = self.full_adj if current_round >= 4 else self.base_adj
-        if 0 < current_node_id < len(active_list):
-            return active_list[current_node_id]
-        return []
+        node = self.nodes[nid]
+        if node.inf_1 == ident:
+            node.inf_1 = "null"
+            return True
+        elif node.inf_2 == ident:
+            node.inf_2 = "null"
+            return True
+        return False
 
-    def is_move_valid(self, start_id: int, end_id: int, current_round: int) -> bool:
+    def move_inf(self, ident, nid, nid_new) -> bool:
         """
-        移动校验
-        :param start_id:
-        :param end_id:
-        :param current_round:
+        移动影响力
+        :param ident:
+        :param nid:
+        :param nid_new:
         :return:
         """
-        movable = self.get_movable_nodes(start_id, current_round)
-        return any(item["id"] == end_id for item in movable)
+        if self.del_inf(nid, ident):
+            if self.put_inf(nid_new, ident):
+                return True
+        return False
+
+    def replace_inf(self, nid: int, ident: str, ident_new: str) -> bool:
+        """
+        替换影响力
+        :param nid:
+        :param ident:
+        :param ident_new:
+        :return:
+        """
+        node = self.nodes[nid]
+        if node.inf_1 == ident:
+            node.inf_1 = ident_new
+            return True
+        elif node_c >= 1 and node.inf_2 == ident:
+            node.inf_2 = ident_new
+            return True
+        return False

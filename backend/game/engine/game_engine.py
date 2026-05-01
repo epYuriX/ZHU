@@ -15,10 +15,6 @@ class GameEngine:
         current_round: 当前回合数: 0: 游戏开始时, 1~8, 9: 最终结算
         current_banker: 当前回合庄家
         next_banker: 下回合庄家
-        ---------------- 玩家信息
-
-        facility: 设施
-        city: 城市样式
         ---------------- 控制类
         map_manager: 地图控制
         event_manager: 事件(地图探索抽取资源卡)
@@ -40,47 +36,6 @@ class GameEngine:
         self.players = {
             ident: Player(self._get_uid_by_ident(ident), ident)
             for ident in self.player_identities
-        }
-        self.character = {
-            "P1": {},
-            "P2": {},
-            "P3": {},
-            "P4": {},
-        }
-
-        self.role = {
-            "P1": {
-                "cover": None,
-                "available": [],
-                "discard": [],
-            },
-            "P2": {
-                "cover": None,
-                "available": [],
-                "discard": [],
-            },
-            "P3": {
-                "cover": None,
-                "available": [],
-                "discard": [],
-            },
-            "P4": {
-                "cover": None,
-                "available": [],
-                "discard": [],
-            },
-        }
-        self.facility = {
-            "P1": {},
-            "P2": {},
-            "P3": {},
-            "P4": {},
-        }
-        self.city = {
-            "P1": {},
-            "P2": {},
-            "P3": {},
-            "P4": {},
         }
         # 游戏状态
         self.phase = "prep"

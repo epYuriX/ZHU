@@ -1,10 +1,10 @@
-# game / data / map_config.py
+# game/entity/map.py
 # 4人地图
 NODE_DATAILS_4 = [
     {
         "id": 1,  # node id
         "type": "node",  # node - 资源点, link - 通道
-        "lv": 1,  # node le
+        "lv": 1,  # node lv
         "name": "A-01",  # node name
         "area": "A",  # 所属区块
         "color": "#007BFF",  # 所属区颜色
