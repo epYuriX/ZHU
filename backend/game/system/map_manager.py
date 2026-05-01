@@ -1,5 +1,4 @@
-# game / map_manager.py
-from platform import node
+# game/system/map_manager.py
 
 from game.data.map_config import (
     NODE_DATAILS_4,

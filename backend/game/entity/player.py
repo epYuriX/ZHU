@@ -1,37 +1,48 @@
-# game / player.py
+# game/entity/player.py
 class Player:
     """
     游戏内玩家类
         identity: 玩家在局内编号 (P1, P2, P3, P4)
-        user_id: 玩家账号 id
+        uid: 玩家账号 id
         score: 得分
+        character: 人物
+        resources: 资源
+            money: 钱币
+            yuan_yan: 源岩
+            yuan_shi: 源石
+            yi_tie: 异铁
+            zcys: 至纯源石
+        role: 角色
+            cover: 盖放
+            available[]: 可用
+            discard[]: 弃牌区
         current_node: 在地图上的位置
         is_banker: 本回合是否为庄家
-        pending_event: 待处理事件
-        ---------------- 货币 / 资源
-        money: 钱币
-        yuan_yan: 源岩
-        yuan_shi: 源石
-        yi_tie: 异铁
-        zcys: 至纯源石
-        ---------------- 干员 / 本回合出场干员
-        member_list: 干员列表
-        member: 本回合出场干员
-        ---------------- 建筑区
+
+
+
         space: 每个玩家有一个 3 * 3 的建筑区用于摆放建筑卡
+
+        pending_event: 待处理事件
     """
 
-    def __init__(self, user_id, identity):
+    def __init__(self, uid, identity):
         self.identity = identity  # P1, P2, P3, P4
-        self.user_id = user_id
+        self.uid = uid
+        self.character = None
         self.score = 0
-        self.money = 0
-        self.yuan_yan = 0
-        self.yuan_shi = 0
-        self.yi_tie = 0
-        self.zcys = 0
-        self.member_list = []
-        self.member = None
+        self.resources = {
+            "money": 0,
+            "yuan_yan": 0,
+            "yuan_shi": 0,
+            "yi_tie": 0,
+            "zcys": 0,
+        }
+        self.role = {
+            "cover": None,
+            "available": [],
+            "discard": [],
+        }
         self.space = [
             ["null", "null", "null"],
             ["null", "null", "null"],

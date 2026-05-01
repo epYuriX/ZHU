@@ -45,11 +45,18 @@ class Round:
         """
         # 回合开始时操作
         # 1. 盖放角色牌
+        self.select_roles()
         self.phase = "action"
-        self.engine.event_manager.dispatch(
-
-        )
         pass
+
+    def select_roles(self):
+        """
+        盖牌
+        """
+        for ident in self.order:
+            player = self.engine.players.get(ident)
+            if player:
+                self.engine.action_manager.select_role(player)
 
     def next_turn(self):
         """
@@ -82,3 +89,5 @@ class Round:
         :param ident:
         """
         pass
+
+
