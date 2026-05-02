@@ -530,7 +530,7 @@ NODE_DATAILS_4 = [
 # 可选初始位置
 OPTIONAL_4 = [1, 2, 4, 5, 7, 19]
 
-# 4人邻接表
+# 4人资源点邻接表
 ADJACENCY_LIST_4 = [
     [
         # 0
