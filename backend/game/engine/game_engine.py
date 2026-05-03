@@ -58,6 +58,9 @@ class GameEngine:
         游戏准备阶段
         """
         # 接下来要在这里制作玩家选择位置
+        #
+        #
+        #
 
     def start_new_round(self):
         self.current_round += 1
