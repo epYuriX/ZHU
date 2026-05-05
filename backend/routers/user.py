@@ -1,4 +1,4 @@
-# routers / user.py
+# routers/user.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
@@ -15,7 +15,7 @@ router = APIRouter(
 @router.post("/register")
 def register(user: UserCreate, db: Session = Depends(get_db)):
     """
-    user register
+    用户注册
     :param user:
     :param db:
     :return:
@@ -39,7 +39,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 @router.post("/login")
 def login(user: UserLogin, db: Session = Depends(get_db)):
     """
-    user login
+    用户登录
     :param user:
     :param db:
     :return:
@@ -51,7 +51,7 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="密码错误")
     token = create_token({
         "sub": db_user.username,
-        "user_id": db_user.id
+        "uid": db_user.uid
     })
     return {
         "access_token": token,

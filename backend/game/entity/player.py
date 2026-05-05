@@ -20,7 +20,6 @@ class Player:
         city: 城市
         current_node: 在地图上的位置
         is_banker: 本回合是否为庄家
-
     """
 
     def __init__(self, uid, identity):
