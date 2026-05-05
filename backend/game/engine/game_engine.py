@@ -47,6 +47,8 @@ class GameEngine:
         self.round: Round | None = None
         self.current_action_session: ActionSession | None = None
 
+
+
     def _get_uid_by_ident(self, ident: str):
         for uid, i in self.uid_to_ident.items():
             if i == ident:
@@ -56,11 +58,19 @@ class GameEngine:
     def game_prep(self):
         """
         游戏准备阶段
+            轮流选择初始位置
         """
-        # 接下来要在这里制作玩家选择位置
-        #
-        #
-        #
+
+
+    def select_location(self):
+        """
+        玩家选择位置
+        :return:
+        """
+        # 这里设计选择位置的功能
+        # 这里需要向前端发送“现在需要选择位置”
+        # 前端选择后调用map_manager中的放置玩家角色函数
+
 
     def start_new_round(self):
         self.current_round += 1

@@ -65,7 +65,7 @@ class MapManager:
         if node.inf_1 == "null":
             node.inf_1 = ident
             return True
-        elif node.int_c > 1 and node.inf_2 == "null":
+        elif node.inf_c > 1 and node.inf_2 == "null":
             node.inf_2 = ident
             return True
         return False
@@ -111,7 +111,7 @@ class MapManager:
         if node.inf_1 == ident:
             node.inf_1 = ident_new
             return True
-        elif node_c > 1 and node.inf_2 == ident:
+        elif node.inf_c > 1 and node.inf_2 == ident:
             node.inf_2 = ident_new
             return True
         return False
@@ -172,8 +172,8 @@ class MapManager:
         if link:
             if self.del_player(nid, ident):
                 if self.put_player(nid_new, ident):
-                    self.del_other_inf(link.id, ident)
-                    self.del_other_inf(link.by, ident)
+                    self.del_other_inf(link['id'], ident)
+                    self.del_other_inf(link['by'], ident)
                     self.put_inf(nid, ident)
                     return True
         return False
