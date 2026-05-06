@@ -1,6 +1,6 @@
 # manager/room_manager.py
 from fastapi import WebSocket
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 import uuid
 from schemas import ServerBroadcast, ServerMessage
 
@@ -15,8 +15,11 @@ class RoomManager:
 
     def get_room_list(self):
         """
-        get room list
-        :return:
+        获取房间列表
+        :return: 房间列表[]:
+                    rid: 房间id
+                    room_name: 房间名
+                    player_count: 房间人数
         """
         return [
             {
@@ -29,7 +32,7 @@ class RoomManager:
 
     def create_room(self, room_name: str, host_id: int):
         """
-        new room
+        创建房间
         :param room_name:
         :param host_id:
         :return:
@@ -212,6 +215,7 @@ class RoomManager:
                 "uid": target_id,
                 "msg": f"玩家 {target_id} 已飞升"
             })
+
 
 
 room_manager = RoomManager()

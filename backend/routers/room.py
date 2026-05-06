@@ -148,28 +148,5 @@ async def _handle_client_message(data: dict, room, rid: str, uid: int, websocket
             await websocket.send_json({"type": ServerMessage.ERROR, "msg": msg})
         return
 
-    # 游戏内操作统一交由 game engine 处理（路由层不实现具体游戏逻辑）
-    # 如果房间正在游戏中并且 engine 可用，则将消息转发给 engine 的通用入口。
-    # 这样可以让游戏逻辑集中在 engine 中，降低路由和房间管理的耦合度。
-    if room.status == "playing" and getattr(room, "engine", None):
-        try:
-            # 优先使用 engine 提供的通用处理接口
-            if hasattr(room.engine, "handle_client_message"):
-                await room.engine.handle_client_message(uid, msg_type, msg_payload)
-            else:
-                # 退回到旧的具体接口（如果 engine 提供），兼容现有实现
-                if msg_type == GameAction.PREP_SELECT and hasattr(room.engine, "handle_prep_select"):
-                    node_id = msg_payload.get("node_id")
-                    res = await room.engine.handle_prep_select(uid, node_id)
-                    await room.broadcast({
-                        "type": ServerBroadcast.GAME_STATE_UPDATE,
-                        "payload": {"result": res, "state": room.engine.get_game_state()},
-                    })
-                else:
-                    # 如果 engine 提供未知动作的统一处理函数也可以调用
-                    if hasattr(room.engine, "handle_unknown_action"):
-                        await room.engine.handle_unknown_action(uid, msg_type, msg_payload)
-        except Exception:
-            # 防止 engine 内部错误导致 websocket 断开，向客户端返回通用错误提示
-            await websocket.send_json({"type": ServerMessage.ERROR, "msg": "游戏操作处理失败"})
-        return
+    if msg_type in GameAction:
+        oper

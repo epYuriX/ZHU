@@ -76,6 +76,8 @@ class GameEngine:
         self.current_round += 1
 
 
+    def operate_analysis(self, ident, opt):
+        pass
 
 
 
