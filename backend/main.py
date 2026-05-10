@@ -22,4 +22,6 @@ def root():
     """
     :return: {"msg": "ok"}
     """
+    print("Hello World!")
     return {"msg": "ok"}
+l

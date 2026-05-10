@@ -47,8 +47,8 @@ class RoomManager:
 
     def remove_room(self, rid: str):
         """
-        remove room
-        :param rid: 房间 id
+        清除房间
+        :param rid: 房间id
         :return:
         """
         if rid in self.active_rooms:
