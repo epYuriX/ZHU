@@ -141,6 +141,7 @@ class RoomManager:
         :param rid:
         :param uid:
         :return:
+
         """
         room = self.get_room(rid)
         if not room or room.status != "waiting":
