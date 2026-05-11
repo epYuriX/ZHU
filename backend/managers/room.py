@@ -1,4 +1,4 @@
-# manager/room.py
+# managers/room.py
 from game import GameEngine
 from typing import List, Dict, Optional
 

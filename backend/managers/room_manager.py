@@ -1,4 +1,4 @@
-# manager/room_manager.py
+# managers/room_manager.py
 from fastapi import WebSocket
 from typing import Dict, Optional
 import uuid

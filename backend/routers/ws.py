@@ -1,6 +1,7 @@
 # routers/ws.py
 from fastapi import WebSocket
 from starlette.websockets import WebSocketDisconnect
+from managers import connection_manager
 from auth.auth import verify_token
 
 router = APIRouter(
@@ -25,13 +26,17 @@ async def websocket_connect(websocket: WebSocket):
     if not payload:
         await websocket.close(code=1008)
         return
-    # 接受连接
-    await websocket.accept()
+    # 保存连接
+    uid = payload.get("uid")
+    await connection_manager.connect(uid, websocket)
     try:
         while True:
             msg = await websocket.receive_json()
-            await websocket.send_json({"echo": msg})
             # 处理
+            #
+            #
+            #
+            #
+            #
     except WebSocketDisconnect:
-        # 连接断开
-        pass
+        connection_manager.disconnect(uid)

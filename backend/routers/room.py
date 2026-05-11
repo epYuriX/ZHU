@@ -1,6 +1,6 @@
 # routers / room_manager.py
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query, status
-from manager import room_manager
+from managers import room_manager
 from schemas import PlayerAction, ServerMessage, ServerBroadcast, GameAction
 from auth.auth import verify_token
 
