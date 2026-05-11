@@ -1,4 +1,4 @@
-# auth / auth.py
+# auth/auth.py
 from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta
@@ -38,6 +38,7 @@ def create_token(data: dict):
     expire = datetime.utcnow() + timedelta(hours=2)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
 
 def verify_token(token: str):
     """

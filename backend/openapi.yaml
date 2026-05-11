@@ -1,0 +1,300 @@
+openapi: 3.0.3
+info:
+  title: ZHU01 后端 API
+  version: "1.0.0"
+  description: |
+    该 OpenAPI 规范基于项目 `backend/` 源代码自动生成，描述了账户（User）与房间（Room）相关的 HTTP 接口。
+    WebSocket 接口在 OpenAPI 中非标准化表示，文档中以 `x-websocket` 扩展和详细描述进行补充。
+servers:
+  - url: http://localhost:8000
+    description: 本地开发服务器
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    UserCreate:
+      type: object
+      required: [username, name, password]
+      properties:
+        username:
+          type: string
+        name:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+      example:
+        username: alice
+        name: Alice
+        password: pwd123
+        email: a@example.com
+        phone: '123'
+
+    UserLogin:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      example:
+        username: alice
+        password: pwd123
+
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+      example:
+        access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        token_type: bearer
+
+    MessageResponse:
+      type: object
+      properties:
+        msg:
+          type: string
+      example:
+        msg: 注册成功
+
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+      example:
+        detail: 用户不存在
+
+    RoomListItem:
+      type: object
+      properties:
+        rid:
+          type: string
+        room_name:
+          type: string
+        player_count:
+          type: integer
+      example:
+        rid: a1b2c3d4
+        room_name: 房间A
+        player_count: 2
+
+    CreateRoomRequest:
+      type: object
+      required: [room_name, uid]
+      properties:
+        room_name:
+          type: string
+        uid:
+          type: integer
+      example:
+        room_name: 测试房
+        uid: 1
+
+    CreateRoomResponse:
+      type: object
+      properties:
+        rid:
+          type: string
+        status:
+          type: string
+      example:
+        rid: a1b2c3d4
+        status: created
+
+    LeaveRoomRequest:
+      type: object
+      required: [rid, uid]
+      properties:
+        rid:
+          type: string
+        uid:
+          type: integer
+      example:
+        rid: a1b2c3d4
+        uid: 1
+
+    LeaveRoomResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        msg:
+          type: string
+      example:
+        status: success
+
+paths:
+  /user/register:
+    post:
+      tags: [用户模块]
+      summary: 用户注册
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '200':
+          description: 注册成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: 用户名已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /user/login:
+    post:
+      tags: [用户模块]
+      summary: 用户登录，返回 JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        '200':
+          description: 登录成功，返回 token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: 登录失败（用户不存在或密码错误）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /room/list:
+    get:
+      tags: [房间模块]
+      summary: 获取房间列表
+      responses:
+        '200':
+          description: 房间列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoomListItem'
+
+  /room/create:
+    post:
+      tags: [房间模块]
+      summary: 创建房间
+      description: |
+        创建房间。服务器端实现接受简单参数（代码中为函数参数 room_name, uid）。
+        在 OpenAPI 中以 JSON body 表示更为规范。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRoomRequest'
+      responses:
+        '200':
+          description: 房间创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateRoomResponse'
+
+  /room/leave:
+    post:
+      tags: [房间模块]
+      summary: 主动离开房间
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveRoomRequest'
+      responses:
+        '200':
+          description: 离开结果
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRoomResponse'
+
+  /room/ws/{rid}:
+    get:
+      tags: [房间模块]
+      summary: 房间 WebSocket（说明性文档）
+      description: |
+        该端点为 WebSocket 协议，不属于标准 HTTP 请求/响应。要连接请使用 WebSocket 客户端：
+        `ws://{host}/room/ws/{rid}?token=<JWT>`。
+        - query 参数 `token`：必需，JWT，用于鉴权（2 小时有效，见 auth 模块）
+        - 若鉴权失败，服务器会关闭连接（close code WS_1008_POLICY_VIOLATION）。
+        - 连接成功后服务器会发送入房快照（JOIN_SUCCESS），并通过广播/单发消息与客户端交互。
+      parameters:
+        - name: rid
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '101':
+          description: Switching Protocols (WebSocket 升级)
+        '401':
+          description: 鉴权失败或 token 无效
+      x-websocket: true
+      x-websocket-messages:
+        joinSnapshot:
+          description: 入房快照（Server -> 新玩家）
+          example:
+            type: JOIN_SUCCESS
+            payload:
+              rid: a1b2c3d4
+              room_name: 房间A
+              host_id: 1
+              players:
+                - uid: 1
+                  is_ready: false
+                - uid: 2
+                  is_ready: true
+        clientMessages:
+          description: 客户端发送的示例消息
+          examples:
+            ready:
+              value:
+                type: READY
+            kick:
+              value:
+                type: KICK_PLAYER
+                payload:
+                  target_id: 3
+            setMode:
+              value:
+                type: SET_ROOM_MODE
+                payload:
+                  mode: 3
+
+security:
+  - BearerAuth: []
+
