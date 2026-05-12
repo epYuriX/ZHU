@@ -41,16 +41,41 @@ class RoomManager:
         :return: Bool
         """
         if uid in self.user_room_map:
+            # 用户已在房间中
             return False
         room = self.rooms.get(rid)
         if not room:
             return False
-        # 房间满员
+
         if len(room.players) >= room.max_players:
+            # 房间满员
             return False
-        # 游戏已经开始
         if room.status != "waiting":
+            # 房间不在[等待]状态
             return False
         room.players.append(uid)
         self.user_room_map[uid] = rid
         return True
+
+    def leave_room(self, uid: int):
+        """
+        离开房间
+        :param uid:
+        :return:
+        """
+        rid = self.user_room_map.get(uid)
+        if not rid:
+            return
+        room = self.rooms.get(rid)
+        if not room:
+            return
+        # 删除玩家
+        for key, value in room.players.items():
+            if value == uid:
+                room.players[key] = None
+                break
+        # 删除映射
+        del self.user_room_map[uid]
+        # 房间没人
+
+        # 房主退出
