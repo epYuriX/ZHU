@@ -120,6 +120,9 @@ class RoomManager:
                     del self.user_room_map[uid]
 
 
+
+
+
         # 删除房间
         del self.rooms[rid]
 
