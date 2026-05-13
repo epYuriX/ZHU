@@ -118,16 +118,10 @@ class RoomManager:
             if uid is not None:
                 if uid in self.user_room_map:
                     del self.user_room_map[uid]
-
-
-
-
-
-
-
-
         # 删除房间
         del self.rooms[rid]
+
+        pass
 
     def get_room_list(self):
         """
