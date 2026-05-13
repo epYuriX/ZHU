@@ -19,7 +19,12 @@ class Room:
         """
         self.rid = rid
         self.oid = oid
-        self.players = {"P1": None, "P2": None, "P3": None, "P4": None}  # P1~P4 -> uid/None
-        self.player_cnt = 0
+        self.players = {
+            "P1": oid,
+            "P2": None,
+            "P3": None,
+            "P4": None
+        }  # P1~P4 -> uid/None
+        self.player_cnt = 1
         self.max_players = 4
         self.status = "waiting"  # waiting, ready, playing
