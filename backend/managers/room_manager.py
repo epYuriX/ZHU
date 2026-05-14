@@ -121,7 +121,12 @@ class RoomManager:
         # 删除房间
         del self.rooms[rid]
 
+
+
         pass
+
+
+
 
     def get_room_list(self):
         """
