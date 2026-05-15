@@ -75,11 +75,9 @@ class RoomManager:
         :param uid: 用户id
         :return:
         """
-        # 获取房间id
         rid = self.user_room_map.get(uid)
         if not rid:
             return
-        # 获取房间
         room = self.rooms.get(rid)
         if not room:
             return
@@ -98,7 +96,6 @@ class RoomManager:
         # 删除映射
         if uid in self.user_room_map:
             del self.user_room_map[uid]
-
         # 房间没人 -> 删除房间
         if room.player_cnt == 0:
             del self.rooms[rid]
@@ -106,7 +103,6 @@ class RoomManager:
     def dissolve_room(self, rid: int):
         """
         解散房间
-
         :param rid: 房间id
         :return:
         """

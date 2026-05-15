@@ -49,4 +49,8 @@ class Dispatcher:
 dispatcher = Dispatcher()
 
 dispatcher.register("READY", ready)
-dispatcher.register("GET_ROOM_LIST", get_room_list)
+dispatcher.register("GET_ROOM_LIST", handle_get_room_list)
+dispatcher.register("CREATE_ROOM", handle_create_room)
+dispatcher.register("JOIN_ROOM", handle_join_room)
+dispatcher.register("LEAVE_ROOM", handle_leave_room)
+dispatcher.register("START_GAME", handle_start_game)

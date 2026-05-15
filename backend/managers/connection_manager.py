@@ -5,6 +5,13 @@ from starlette.websockets import WebSocket
 class ConnectionManager:
     """
     WebSocket 连接管理器
+        connections{}: 连接列表 uid -> websocket
+    方法目录
+        __init__(): 初始化
+        connect(uid, websocket): 添加连接
+        disconnect(uid): 断开连接
+        send_to_user(uid, msg{}): 发送消息给指定用户
+        broadcast(uids[], msg{}): 列表广播
     """
 
     def __init__(self):
