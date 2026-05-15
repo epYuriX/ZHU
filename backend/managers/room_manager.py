@@ -121,53 +121,32 @@ class RoomManager:
         # 删除房间
         del self.rooms[rid]
 
-
-
-        pass
-
-
-
-
     def get_room_list(self):
         """
         获取房间列表
-
         :return: list
         """
-
         result = []
-
         for room in self.rooms.values():
             result.append({
-
                 "rid": room.rid,
-
                 "oid": room.oid,
-
                 "players": room.players,
-
                 "player_cnt": room.player_cnt,
-
                 "max_players": room.max_players,
-
                 "status": room.status
             })
-
         return result
 
     def get_room_by_uid(self, uid: int):
         """
         通过uid获取房间
-
         :param uid: 用户id
         :return: Room / None
         """
-
         rid = self.user_room_map.get(uid)
-
         if not rid:
             return None
-
         return self.rooms.get(rid)
 
 
